@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Toast, useToast } from '../ui/Toast';
 import { ProblemType } from '../../types/problem';
 import { getApiConfigForRequest } from '../../services/apiConfig';
+import { getCurrentTier } from '../../services/licenseStore';
 
 interface ParsedItem {
   title: string;
@@ -80,6 +81,11 @@ export const BatchEditor: React.FC = () => {
 
   const handleStartBatch = async () => {
     if (parsedItems.length === 0) return;
+    const tier = getCurrentTier();
+    if (tier === 'free' && parsedItems.length > 3) {
+      showToast('免费版限制', '免费版最多同时处理 3 条题目，升级 Pro 解锁无限制。', 'error');
+      return;
+    }
     try {
       const res = await fetch('http://localhost:3001/api/batch/start', {
         method: 'POST',
