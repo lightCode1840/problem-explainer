@@ -1,0 +1,42 @@
+import React from 'react';
+import { ContentTypePlugin, TemplateProps } from '../types';
+import { buildLeetCodeSystemPrompt } from './prompt';
+import { ProgrammingEditor } from '../../components/editor/ProgrammingEditor';
+import { LeetCodeTemplate } from '../../templates/LeetCodeTemplate';
+import { LeetCodeProblemData } from '../../types/problem';
+
+const defaultTheme = {
+  background: '#0f0f11',
+  cardBg: '#18181b',
+  textPrimary: '#f4f4f5',
+  textSecondary: '#71717a',
+  accent: '#6366f1',
+  borderColor: '#27272a',
+  codeFont: 'ui-monospace, SFMono-Regular, Menlo, monospace',
+};
+
+const LeetCodeTemplateAdapter: React.FC<TemplateProps> = ({ data }) => (
+  <LeetCodeTemplate data={data} />
+);
+
+export const leetcodePlugin: ContentTypePlugin = {
+  id: 'leetcode',
+  displayName: '算法图解',
+  icon: '⚡',
+  buildSystemPrompt: (language = 'javascript') => buildLeetCodeSystemPrompt(language),
+  parseResponse: (raw: string): LeetCodeProblemData => {
+    const parsed = JSON.parse(raw) as LeetCodeProblemData;
+    if (!parsed.id) parsed.id = `lc-${Date.now()}`;
+    return parsed;
+  },
+  EditorComponent: ProgrammingEditor,
+  defaultTemplateId: 'dark-code',
+  templates: [
+    {
+      id: 'dark-code',
+      name: '深色代码风',
+      theme: defaultTheme,
+      Component: LeetCodeTemplateAdapter,
+    },
+  ],
+};
