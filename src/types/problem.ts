@@ -5,7 +5,9 @@ export interface BaseProblemData {
   type: ProblemType;
   title: string;
   durationInFrames?: number;
-  audioUrl?: string; // 动态生成的 TTS 语音文件地址
+  audioUrl?: string;
+  templateId?: string;
+  subtitles?: import('../plugins/types').SubtitleSegment[];
 }
 
 export interface GrammarProblemData extends BaseProblemData {
