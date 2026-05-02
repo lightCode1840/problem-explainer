@@ -5,11 +5,12 @@ import { ApiConfig, PRESETS, getApiConfig, saveApiConfig } from '../../services/
 interface SettingsModalProps {
   open: boolean;
   onClose: () => void;
+  onLicenseOpen?: () => void;
 }
 
 type TestStatus = 'idle' | 'testing' | 'success' | 'error';
 
-export const SettingsModal: React.FC<SettingsModalProps> = ({ open, onClose }) => {
+export const SettingsModal: React.FC<SettingsModalProps> = ({ open, onClose, onLicenseOpen }) => {
   const [preset, setPreset] = useState<ApiConfig['preset']>('deepseek');
   const [apiKey, setApiKey] = useState('');
   const [baseURL, setBaseURL] = useState(PRESETS.deepseek.baseURL);
@@ -210,6 +211,19 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ open, onClose }) =
             </p>
           </div>
         </div>
+
+        {/* License entry */}
+        {onLicenseOpen && (
+          <div className="px-6 pb-4">
+            <button
+              onClick={() => { onClose(); onLicenseOpen(); }}
+              className="w-full py-2.5 px-4 rounded-xl text-sm font-medium border border-gray-200 dark:border-zinc-700 text-gray-600 dark:text-zinc-300 hover:bg-gray-50 dark:hover:bg-zinc-800 transition-colors flex items-center gap-2"
+            >
+              <span>🔑</span>
+              License 激活 / 查看授权状态
+            </button>
+          </div>
+        )}
 
         {/* Footer */}
         <div className="px-6 py-4 border-t border-gray-100 dark:border-zinc-800 flex items-center gap-3">

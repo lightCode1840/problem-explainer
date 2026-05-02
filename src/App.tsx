@@ -15,6 +15,7 @@ import { LeetCodeProblemData } from './types/problem';
 import { getCurrentTier } from './services/licenseStore';
 import { addToHistory } from './services/historyStore';
 import { HistoryPanel } from './components/ui/HistoryPanel';
+import { LicenseModal } from './components/ui/LicenseModal';
 
 export const App: React.FC = () => {
   const { isDark, toggleTheme } = useTheme();
@@ -25,6 +26,7 @@ export const App: React.FC = () => {
   const { toastMessage, showToast, setToastMessage } = useToast();
 
   const [settingsOpen, setSettingsOpen] = useState(false);
+  const [licenseOpen, setLicenseOpen] = useState(false);
   const [apiConfigured, setApiConfigured] = useState(hasApiConfig);
   const [activeSection, setActiveSection] = useState<string>(allPlugins[0]?.id ?? 'java_interview');
 
@@ -124,7 +126,9 @@ export const App: React.FC = () => {
       <SettingsModal
         open={settingsOpen}
         onClose={() => { setSettingsOpen(false); setApiConfigured(hasApiConfig()); }}
+        onLicenseOpen={() => setLicenseOpen(true)}
       />
+      <LicenseModal open={licenseOpen} onClose={() => setLicenseOpen(false)} />
       <Toast message={toastMessage} onClose={() => setToastMessage(null)} />
 
       <div className="pl-16 pt-16 min-h-screen">
