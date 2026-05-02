@@ -26,6 +26,18 @@ export async function exportVideo(
   console.log('Entry point:', entry);
   console.log('Output destination:', outputFile);
 
+  // Remotion's server-side renderer serves the bundle from its own webpack-bundle
+  // server (a temp URL like http://localhost:3000/...). Relative audioUrl paths
+  // resolve against that bundle server, not our Express server, causing a 404.
+  // Convert relative paths to absolute before handing off to Remotion.
+  const port = process.env.PORT || 3001;
+  const renderData: AnyProblemData = {
+    ...data,
+    audioUrl: data.audioUrl?.startsWith('/')
+      ? `http://localhost:${port}${data.audioUrl}`
+      : data.audioUrl,
+  };
+
   try {
     // 2. Bundle the video using Webpack (Remotion's bundler)
     console.log('Bundling video...');
@@ -39,11 +51,11 @@ export async function exportVideo(
     const composition = await selectComposition({
       serveUrl: bundleLocation,
       id: compositionId,
-      inputProps: { data, showWatermark },
+      inputProps: { data: renderData, showWatermark },
     });
 
     // Use the accurate duration calculated from TTS
-    const durationInFrames = data.durationInFrames || composition.durationInFrames;
+    const durationInFrames = renderData.durationInFrames || composition.durationInFrames;
 
     // 4. Render the video
     console.log(`Rendering video (${durationInFrames} frames)...`);
@@ -52,7 +64,7 @@ export async function exportVideo(
       serveUrl: bundleLocation,
       codec: 'h264',
       outputLocation: outputFile,
-      inputProps: { data, showWatermark },
+      inputProps: { data: renderData, showWatermark },
       onProgress: ({ progress }) => {
         console.log(`Rendering progress: ${Math.round(progress * 100)}%`);
         if (onProgressCallback) {
