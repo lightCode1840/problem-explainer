@@ -3,10 +3,31 @@ import * as path from "path";
 import * as crypto from "crypto";
 import { getAudioDurationInSeconds } from 'get-audio-duration';
 import { EdgeTTS } from 'node-edge-tts';
+import { SubtitleSegment } from '../plugins/types';
 
 const outputDir = path.join(process.cwd(), "public", "voiceover");
 
-export async function generateTTS(text: string, _filename?: string): Promise<{ audioUrl: string; durationInSeconds: number }> {
+export function estimateSubtitles(text: string, durationInSeconds: number): SubtitleSegment[] {
+  const phrases = text.split(/(?<=[。！？\n])\s*/g).map(s => s.trim()).filter(Boolean);
+  if (phrases.length === 0) {
+    return [{ text, startMs: 0, endMs: Math.round(durationInSeconds * 1000) }];
+  }
+  const totalChars = phrases.reduce((sum, p) => sum + p.length, 0);
+  const totalMs = durationInSeconds * 1000;
+  let currentMs = 0;
+  return phrases.map(phrase => {
+    const segMs = (phrase.length / totalChars) * totalMs;
+    const segment: SubtitleSegment = {
+      text: phrase,
+      startMs: Math.round(currentMs),
+      endMs: Math.round(currentMs + segMs),
+    };
+    currentMs += segMs;
+    return segment;
+  });
+}
+
+export async function generateTTS(text: string, _filename?: string): Promise<{ audioUrl: string; durationInSeconds: number; subtitles: SubtitleSegment[] }> {
   if (!fs.existsSync(outputDir)) {
     fs.mkdirSync(outputDir, { recursive: true });
   }
@@ -21,7 +42,8 @@ export async function generateTTS(text: string, _filename?: string): Promise<{ a
       const durationInSeconds = await getAudioDurationInSeconds(outputPath);
       return {
         audioUrl: `/voiceover/${filename}.mp3`,
-        durationInSeconds
+        durationInSeconds,
+        subtitles: estimateSubtitles(text, durationInSeconds),
       };
     }
 
@@ -46,10 +68,10 @@ export async function generateTTS(text: string, _filename?: string): Promise<{ a
     // Get exact audio duration
     const durationInSeconds = await getAudioDurationInSeconds(outputPath);
     
-    // Return the relative path for frontend to use
     return {
       audioUrl: `/voiceover/${filename}.mp3`,
-      durationInSeconds
+      durationInSeconds,
+      subtitles: estimateSubtitles(text, durationInSeconds),
     };
   } catch (error) {
     console.error("Error generating TTS:", error);

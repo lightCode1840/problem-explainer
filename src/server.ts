@@ -234,12 +234,11 @@ app.post('/api/parse', async (req, res) => {
     if (ttsText) {
       console.log('Generating TTS for explanation...');
       try {
-        const { audioUrl, durationInSeconds } = await generateTTS(ttsText, parsedData.id || Date.now().toString());
-        // Extend the parsed data with audio info
+        const { audioUrl, durationInSeconds, subtitles } = await generateTTS(ttsText, parsedData.id || Date.now().toString());
         parsedData.audioUrl = `http://localhost:${port}${audioUrl}`;
-        // Convert seconds to frames (assuming 30fps default)
         const fps = 30;
-        parsedData.durationInFrames = Math.ceil(durationInSeconds * fps) + (2 * fps); // Add 2 seconds padding
+        parsedData.durationInFrames = Math.ceil(durationInSeconds * fps) + (2 * fps);
+        parsedData.subtitles = subtitles;
       } catch (ttsError) {
         console.error('Failed to generate TTS, proceeding without audio:', ttsError);
         parsedData.durationInFrames = 500; // Fallback default
@@ -292,14 +291,15 @@ app.post('/api/generate-audio', async (req, res) => {
     const problemId = id || Date.now().toString();
     console.log('Generating TTS manually...');
     
-    const { audioUrl, durationInSeconds } = await generateTTS(ttsText, problemId);
-    
+    const { audioUrl, durationInSeconds, subtitles } = await generateTTS(ttsText, problemId);
+
     const fps = 30;
-    const durationInFrames = Math.ceil(durationInSeconds * fps) + (2 * fps); // Add 2 seconds padding
-    
+    const durationInFrames = Math.ceil(durationInSeconds * fps) + (2 * fps);
+
     res.json({
       audioUrl: `http://localhost:${port}${audioUrl}`,
-      durationInFrames
+      durationInFrames,
+      subtitles,
     });
 
   } catch (error) {
