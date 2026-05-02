@@ -1,17 +1,14 @@
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
-type EditorMode = 'standard' | 'programming' | 'batch';
 type BackendStatus = 'checking' | 'connected' | 'disconnected';
 
 interface TopBarProps {
-  editorMode: EditorMode;
-  onModeChange: (mode: EditorMode) => void;
   onSettingsOpen: () => void;
   isDark: boolean;
   onThemeToggle: () => void;
 }
 
-export const TopBar: React.FC<TopBarProps> = ({ editorMode, onModeChange, onSettingsOpen, isDark, onThemeToggle }) => {
+export const TopBar: React.FC<TopBarProps> = ({ onSettingsOpen, isDark, onThemeToggle }) => {
   const [backendStatus, setBackendStatus] = useState<BackendStatus>('checking');
 
   useEffect(() => {
@@ -30,7 +27,6 @@ export const TopBar: React.FC<TopBarProps> = ({ editorMode, onModeChange, onSett
 
   return (
     <header className="fixed top-0 inset-x-0 z-50 h-16 bg-white dark:bg-zinc-950 border-b border-gray-200 dark:border-zinc-800 flex items-center px-6 gap-4">
-      {/* Logo */}
       <div className="flex items-center gap-2.5 shrink-0">
         <div className="w-7 h-7 rounded-lg bg-indigo-600 flex items-center justify-center">
           <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -42,47 +38,9 @@ export const TopBar: React.FC<TopBarProps> = ({ editorMode, onModeChange, onSett
         </span>
       </div>
 
-      <div className="w-px h-5 bg-gray-200 dark:bg-zinc-700 shrink-0" />
+      <div className="flex-1" />
 
-      {/* Mode switch */}
-      <nav className="flex-1 flex justify-center">
-        <div className="bg-gray-100 dark:bg-zinc-800 p-1 rounded-lg flex items-center gap-0.5">
-          {[
-            { id: 'standard', label: '八股 / 语法题' },
-            { id: 'programming', label: '算法图解' },
-          ].map(({ id, label }) => (
-            <button
-              key={id}
-              onClick={() => onModeChange(id as EditorMode)}
-              className={`px-4 py-1.5 rounded-md text-sm font-medium transition-all duration-150 ${
-                editorMode === id
-                  ? 'bg-white dark:bg-zinc-700 text-indigo-700 dark:text-indigo-400 shadow-sm'
-                  : 'text-gray-500 dark:text-zinc-400 hover:text-gray-700 dark:hover:text-zinc-200'
-              }`}
-            >
-              {label}
-            </button>
-          ))}
-          <div className="w-px h-4 bg-gray-300 dark:bg-zinc-600 mx-1" />
-          <button
-            onClick={() => onModeChange('batch')}
-            className={`px-4 py-1.5 rounded-md text-sm font-medium transition-all duration-150 flex items-center gap-1.5 ${
-              editorMode === 'batch'
-                ? 'bg-white dark:bg-zinc-700 text-emerald-700 dark:text-emerald-400 shadow-sm'
-                : 'text-gray-500 dark:text-zinc-400 hover:text-gray-700 dark:hover:text-zinc-200'
-            }`}
-          >
-            <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 002-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
-            </svg>
-            批量流水线
-          </button>
-        </div>
-      </nav>
-
-      {/* Right: status + actions */}
       <div className="flex items-center gap-2 shrink-0">
-        {/* Backend status */}
         <div className="flex items-center gap-1.5 text-xs font-medium">
           {backendStatus === 'checking' && (
             <span className="flex items-center gap-1.5 text-gray-400 dark:text-zinc-500">
@@ -110,7 +68,6 @@ export const TopBar: React.FC<TopBarProps> = ({ editorMode, onModeChange, onSett
 
         <div className="w-px h-4 bg-gray-200 dark:bg-zinc-700" />
 
-        {/* Theme toggle */}
         <button
           onClick={onThemeToggle}
           className="w-8 h-8 rounded-lg text-gray-400 dark:text-zinc-400 hover:text-gray-600 dark:hover:text-zinc-200 hover:bg-gray-100 dark:hover:bg-zinc-800 flex items-center justify-center transition-colors"
@@ -127,7 +84,6 @@ export const TopBar: React.FC<TopBarProps> = ({ editorMode, onModeChange, onSett
           )}
         </button>
 
-        {/* Settings */}
         <button
           onClick={onSettingsOpen}
           className="w-8 h-8 rounded-lg text-gray-400 dark:text-zinc-400 hover:text-gray-600 dark:hover:text-zinc-200 hover:bg-gray-100 dark:hover:bg-zinc-800 flex items-center justify-center transition-colors"
