@@ -6,9 +6,10 @@ import fs from 'fs';
 import { AnyProblemData } from '../types/problem';
 
 export async function exportVideo(
-  data: AnyProblemData, 
+  data: AnyProblemData,
   outputFilename: string,
-  onProgressCallback?: (progress: number) => void
+  onProgressCallback?: (progress: number) => void,
+  showWatermark = false
 ) {
   // 1. 设置路径
   const compositionId = 'ProblemExplainer';
@@ -38,7 +39,7 @@ export async function exportVideo(
     const composition = await selectComposition({
       serveUrl: bundleLocation,
       id: compositionId,
-      inputProps: { data },
+      inputProps: { data, showWatermark },
     });
 
     // Use the accurate duration calculated from TTS
@@ -51,7 +52,7 @@ export async function exportVideo(
       serveUrl: bundleLocation,
       codec: 'h264',
       outputLocation: outputFile,
-      inputProps: { data },
+      inputProps: { data, showWatermark },
       onProgress: ({ progress }) => {
         console.log(`Rendering progress: ${Math.round(progress * 100)}%`);
         if (onProgressCallback) {

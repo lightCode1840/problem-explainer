@@ -1,4 +1,5 @@
 import React from 'react';
+import { Code2 } from 'lucide-react';
 import { ContentTypePlugin, TemplateProps } from '../types';
 import { buildLeetCodeSystemPrompt } from './prompt';
 import { ProgrammingEditor } from '../../components/editor/ProgrammingEditor';
@@ -22,7 +23,7 @@ const LeetCodeTemplateAdapter: React.FC<TemplateProps> = ({ data }) =>
 export const leetcodePlugin: ContentTypePlugin = {
   id: 'leetcode',
   displayName: '算法图解',
-  icon: '⚡',
+  Icon: Code2,
   buildSystemPrompt: (language = 'javascript') => buildLeetCodeSystemPrompt(language),
   parseResponse: (raw: string): LeetCodeProblemData => {
     const parsed = JSON.parse(raw) as LeetCodeProblemData;

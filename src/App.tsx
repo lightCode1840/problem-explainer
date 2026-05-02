@@ -267,7 +267,7 @@ export const App: React.FC = () => {
                 <button
                   onClick={handleExportVideo}
                   disabled={isExporting}
-                  className="flex-1 flex items-center justify-center gap-2 py-3 px-4 bg-gray-900 dark:bg-zinc-100 hover:bg-gray-800 dark:hover:bg-zinc-200 disabled:opacity-60 disabled:cursor-not-allowed text-white dark:text-zinc-900 text-sm font-semibold rounded-xl transition-colors"
+                  className="flex-1 flex items-center justify-center gap-2 py-3 px-4 bg-zinc-800 hover:bg-zinc-700 dark:bg-zinc-700 dark:hover:bg-zinc-600 disabled:opacity-60 disabled:cursor-not-allowed text-white text-sm font-semibold rounded-xl transition-colors"
                 >
                   {isExporting ? (
                     <>

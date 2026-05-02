@@ -38,7 +38,7 @@ export interface VisualTemplate {
 export interface ContentTypePlugin {
   id: string;
   displayName: string;
-  icon: string;
+  Icon: React.ComponentType<{ size?: number; strokeWidth?: number; className?: string }>;
   buildSystemPrompt: (language?: string) => string;
   parseResponse: (raw: string) => AnyProblemData;
   EditorComponent: React.ComponentType<EditorProps>;

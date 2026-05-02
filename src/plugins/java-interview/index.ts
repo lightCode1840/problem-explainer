@@ -1,4 +1,5 @@
 import React from 'react';
+import { BookOpen } from 'lucide-react';
 import { ContentTypePlugin, TemplateProps } from '../types';
 import { buildJavaInterviewSystemPrompt } from './prompt';
 import { ProblemEditor } from '../../components/editor/ProblemEditor';
@@ -22,7 +23,7 @@ const JavaInterviewTemplateAdapter: React.FC<TemplateProps> = ({ data }) =>
 export const javaInterviewPlugin: ContentTypePlugin = {
   id: 'java_interview',
   displayName: '八股 / 面试题',
-  icon: '☕',
+  Icon: BookOpen,
   buildSystemPrompt: () => buildJavaInterviewSystemPrompt(),
   parseResponse: (raw: string): JavaInterviewProblemData => {
     const parsed = JSON.parse(raw) as JavaInterviewProblemData;

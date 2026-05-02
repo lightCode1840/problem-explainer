@@ -1,4 +1,5 @@
 import React from 'react';
+import { Layers, History } from 'lucide-react';
 import { ContentTypePlugin } from '../../plugins/types';
 
 type SidebarSection = string;
@@ -20,7 +21,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ plugins, activeSection, onSele
           active={activeSection === plugin.id}
           onClick={() => onSelect(plugin.id)}
         >
-          <span className="text-lg leading-none">{plugin.icon}</span>
+          <plugin.Icon size={20} strokeWidth={1.75} />
         </SidebarButton>
       ))}
 
@@ -29,10 +30,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ plugins, activeSection, onSele
         active={activeSection === 'batch'}
         onClick={() => onSelect('batch')}
       >
-        <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75}
-            d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 002-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
-        </svg>
+        <Layers size={20} strokeWidth={1.75} />
       </SidebarButton>
 
       <div className="flex-1" />
@@ -42,10 +40,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ plugins, activeSection, onSele
         active={activeSection === 'history'}
         onClick={() => onSelect('history')}
       >
-        <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75}
-            d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-        </svg>
+        <History size={20} strokeWidth={1.75} />
       </SidebarButton>
     </aside>
   );

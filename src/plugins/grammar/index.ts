@@ -1,4 +1,5 @@
 import React from 'react';
+import { Languages } from 'lucide-react';
 import { ContentTypePlugin, TemplateProps } from '../types';
 import { buildGrammarSystemPrompt } from './prompt';
 import { GrammarEditor } from '../../components/editor/GrammarEditor';
@@ -22,7 +23,7 @@ const GrammarTemplateAdapter: React.FC<TemplateProps> = ({ data }) =>
 export const grammarPlugin: ContentTypePlugin = {
   id: 'grammar',
   displayName: '英语语法题',
-  icon: '📝',
+  Icon: Languages,
   buildSystemPrompt: () => buildGrammarSystemPrompt(),
   parseResponse: (raw: string): GrammarProblemData => {
     const parsed = JSON.parse(raw) as GrammarProblemData;

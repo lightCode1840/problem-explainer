@@ -310,13 +310,13 @@ app.post('/api/generate-audio', async (req, res) => {
 
 app.post('/api/export', async (req, res) => {
   try {
-    const { videoData } = req.body;
+    const { videoData, showWatermark } = req.body;
     if (!videoData) {
       return res.status(400).json({ error: 'Missing videoData' });
     }
 
     const taskId = `${videoData.id || 'unknown'}_${Date.now()}`;
-    exportQueue.addTask(taskId, videoData);
+    exportQueue.addTask(taskId, videoData, !!showWatermark);
 
     // Immediately respond that export has started
     res.json({ 

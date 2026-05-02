@@ -14,14 +14,14 @@ export interface ExportTask {
 class ExportQueue {
   private tasks: Map<string, ExportTask> = new Map();
 
-  addTask(taskId: string, videoData: AnyProblemData): ExportTask {
+  addTask(taskId: string, videoData: AnyProblemData, showWatermark = false): ExportTask {
     const task: ExportTask = {
       id: taskId,
       status: 'pending',
       progress: 0,
     };
     this.tasks.set(taskId, task);
-    this.processTask(taskId, videoData);
+    this.processTask(taskId, videoData, showWatermark);
     return task;
   }
 
@@ -36,26 +36,25 @@ class ExportQueue {
     }
   }
 
-  private async processTask(taskId: string, videoData: AnyProblemData) {
+  private async processTask(taskId: string, videoData: AnyProblemData, showWatermark: boolean) {
     this.updateTask(taskId, { status: 'processing', progress: 0 });
-    
+
     const outputFilename = `export_${taskId}`;
-    
+
     try {
-      // Modify exportVideo to accept a progress callback
       await exportVideo(videoData, outputFilename, (progress) => {
         this.updateTask(taskId, { progress });
-      });
-      
-      this.updateTask(taskId, { 
-        status: 'done', 
+      }, showWatermark);
+
+      this.updateTask(taskId, {
+        status: 'done',
         progress: 1,
         outputUrl: `/api/export/download/${outputFilename}.mp4`
       });
     } catch (error) {
-      this.updateTask(taskId, { 
-        status: 'failed', 
-        error: error instanceof Error ? error.message : 'Unknown error' 
+      this.updateTask(taskId, {
+        status: 'failed',
+        error: error instanceof Error ? error.message : 'Unknown error'
       });
     }
   }
