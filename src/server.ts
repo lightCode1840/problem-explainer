@@ -86,11 +86,11 @@ app.post('/api/batch/scrape', async (req, res) => {
 
 app.post('/api/batch/start', async (req, res) => {
   try {
-    const { items } = req.body;
+    const { items, apiKey, baseURL, model } = req.body;
     if (!items || !Array.isArray(items)) {
       return res.status(400).json({ error: 'Missing items array' });
     }
-    const job = batchQueue.createJob(items);
+    const job = batchQueue.createJob(items, { apiKey, baseURL, model });
     res.json({ jobId: job.id, message: 'Batch job started' });
   } catch (error) {
     console.error('API Error during batch start:', error);
@@ -235,7 +235,7 @@ app.post('/api/parse', async (req, res) => {
       console.log('Generating TTS for explanation...');
       try {
         const { audioUrl, durationInSeconds, subtitles } = await generateTTS(ttsText, parsedData.id || Date.now().toString());
-        parsedData.audioUrl = `http://localhost:${port}${audioUrl}`;
+        parsedData.audioUrl = audioUrl;
         const fps = 30;
         parsedData.durationInFrames = Math.ceil(durationInSeconds * fps) + (2 * fps);
         parsedData.subtitles = subtitles;
@@ -297,7 +297,7 @@ app.post('/api/generate-audio', async (req, res) => {
     const durationInFrames = Math.ceil(durationInSeconds * fps) + (2 * fps);
 
     res.json({
-      audioUrl: `http://localhost:${port}${audioUrl}`,
+      audioUrl,
       durationInFrames,
       subtitles,
     });

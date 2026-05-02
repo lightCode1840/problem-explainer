@@ -1,5 +1,5 @@
 import { AnyProblemData, ProblemType } from '../types/problem';
-import { parseProblemWithLLM } from './llm';
+import { parseProblemWithLLM, LLMConfig } from './llm';
 import { generateTTS } from './tts';
 import { exportQueue } from './exportQueue';
 
@@ -22,12 +22,17 @@ export interface BatchJob {
   items: BatchItem[];
   status: 'running' | 'done' | 'failed';
   createdAt: number;
+  llmConfig?: LLMConfig;
+  model?: string;
 }
 
 class BatchQueue {
   private jobs: Map<string, BatchJob> = new Map();
 
-  createJob(itemsData: Array<{ title: string; question: string; type: ProblemType }>): BatchJob {
+  createJob(
+    itemsData: Array<{ title: string; question: string; type: ProblemType }>,
+    config?: { apiKey?: string; baseURL?: string; model?: string }
+  ): BatchJob {
     const jobId = `batch_${Date.now()}`;
     const items: BatchItem[] = itemsData.map((item, index) => ({
       id: `${jobId}_item_${index}`,
@@ -43,10 +48,12 @@ class BatchQueue {
       items,
       status: 'running',
       createdAt: Date.now(),
+      llmConfig: config ? { apiKey: config.apiKey, baseURL: config.baseURL } : undefined,
+      model: config?.model,
     };
 
     this.jobs.set(jobId, job);
-    this.processJob(jobId); // Async start
+    this.processJob(jobId);
     return job;
   }
 
@@ -89,7 +96,8 @@ class BatchQueue {
     
     // 1. LLM Parsing
     const rawText = `${item.title}\n${item.question}`;
-    const stream = await parseProblemWithLLM(rawText, item.type, 'deepseek-chat'); // Use default or passed model
+    const job = this.jobs.get(jobId);
+    const stream = await parseProblemWithLLM(rawText, item.type, job?.model ?? 'deepseek-chat', 'javascript', job?.llmConfig);
     
     let fullJsonText = '';
     for await (const chunk of stream) {
@@ -127,7 +135,7 @@ class BatchQueue {
     if (ttsText) {
       try {
         const { audioUrl, durationInSeconds } = await generateTTS(ttsText, item.id);
-        parsedData.audioUrl = `http://localhost:${process.env.PORT || 3001}${audioUrl}`;
+        parsedData.audioUrl = audioUrl;
         const fps = 30;
         parsedData.durationInFrames = Math.ceil(durationInSeconds * fps) + (2 * fps);
       } catch (ttsError) {
