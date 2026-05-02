@@ -62,6 +62,25 @@ export async function splitTextToProblems(rawText: string, modelName: string = '
   }
 }
 
+export async function callLLM(
+  systemPrompt: string,
+  userContent: string,
+  modelName: string = 'deepseek-chat',
+  config?: LLMConfig
+): Promise<string> {
+  const client = createClient(config);
+  const response = await client.chat.completions.create({
+    model: modelName,
+    messages: [
+      { role: 'system', content: systemPrompt },
+      { role: 'user', content: userContent },
+    ],
+    response_format: { type: 'json_object' },
+    temperature: 0.1,
+  });
+  return response.choices[0].message.content || '{}';
+}
+
 export async function parseProblemWithLLM(rawText: string, targetType: ProblemType, modelName: string = 'deepseek-chat', language: string = 'javascript', config?: LLMConfig) {
   const systemPrompt = `你是一个专业的教师和题解视频文案编写专家。你的任务是将用户输入的原始题目文本，解析并结构化为特定类型的 JSON 格式数据。
 这个 JSON 数据将直接用于生成带配音的视频。因此，你的 explanation (讲解文案) 字段应该像口语化的老师讲课一样，生动、清晰、循序渐进。

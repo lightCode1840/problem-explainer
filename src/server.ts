@@ -1,6 +1,6 @@
 import express from 'express';
 import cors from 'cors';
-import { parseProblemWithLLM, splitTextToProblems, testConnection } from './services/llm';
+import { parseProblemWithLLM, splitTextToProblems, testConnection, LLMConfig } from './services/llm';
 import { generateTTS } from './services/tts';
 import { exportQueue } from './services/exportQueue';
 import { batchQueue } from './services/batchQueue';
@@ -167,19 +167,25 @@ app.post('/api/batch/merge/:id', (req, res) => {
 
 app.post('/api/parse', async (req, res) => {
   try {
-    const { rawText, targetType, model, language } = req.body;
+    const { rawText, targetType, type: typeParam, model, language, apiKey, baseURL } = req.body;
+    const resolvedType: string = typeParam || targetType;
 
-    if (!rawText || !targetType) {
+    if (!rawText || !resolvedType) {
       return res.status(400).json({ error: 'Missing rawText or targetType' });
     }
 
     const validTypes: ProblemType[] = ['grammar', 'java_interview', 'leetcode'];
-    if (!validTypes.includes(targetType)) {
+    if (!validTypes.includes(resolvedType as ProblemType)) {
       return res.status(400).json({ error: 'Invalid targetType' });
     }
 
-    console.log(`Parsing problem as ${targetType} using model ${model || 'default'} (Language: ${language || 'default'})...`);
-    const stream = await parseProblemWithLLM(rawText, targetType, model, language);
+    const llmConfig: LLMConfig = {};
+    if (apiKey) llmConfig.apiKey = apiKey;
+    if (baseURL) llmConfig.baseURL = baseURL;
+
+    console.log(`Parsing problem as ${resolvedType} using model ${model || 'default'} (Language: ${language || 'default'})...`);
+
+    const stream = await parseProblemWithLLM(rawText, resolvedType as ProblemType, model, language, llmConfig);
 
     res.setHeader('Content-Type', 'text/event-stream');
     res.setHeader('Cache-Control', 'no-cache');

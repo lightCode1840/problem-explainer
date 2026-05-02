@@ -15,9 +15,9 @@ const defaultTheme = {
   codeFont: 'ui-monospace, SFMono-Regular, Menlo, monospace',
 };
 
-const LeetCodeTemplateAdapter: React.FC<TemplateProps> = ({ data }) => (
-  <LeetCodeTemplate data={data} />
-);
+const LeetCodeTemplateAdapter: React.FC<TemplateProps> = ({ data }) =>
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  React.createElement(LeetCodeTemplate, { data: data as any });
 
 export const leetcodePlugin: ContentTypePlugin = {
   id: 'leetcode',

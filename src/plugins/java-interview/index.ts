@@ -15,9 +15,9 @@ const defaultTheme = {
   codeFont: 'ui-monospace, monospace',
 };
 
-const JavaInterviewTemplateAdapter: React.FC<TemplateProps> = ({ data }) => (
-  <JavaInterviewTemplate data={data} />
-);
+const JavaInterviewTemplateAdapter: React.FC<TemplateProps> = ({ data }) =>
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  React.createElement(JavaInterviewTemplate, { data: data as any });
 
 export const javaInterviewPlugin: ContentTypePlugin = {
   id: 'java_interview',

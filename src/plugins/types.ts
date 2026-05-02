@@ -19,7 +19,7 @@ export interface ThemeConfig {
 
 export interface TemplateProps {
   data: AnyProblemData;
-  theme: ThemeConfig;
+  theme?: ThemeConfig;
 }
 
 export interface EditorProps {

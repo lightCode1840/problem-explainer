@@ -15,9 +15,9 @@ const defaultTheme = {
   codeFont: 'ui-monospace, monospace',
 };
 
-const GrammarTemplateAdapter: React.FC<TemplateProps> = ({ data }) => (
-  <GrammarTemplate data={data} />
-);
+const GrammarTemplateAdapter: React.FC<TemplateProps> = ({ data }) =>
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  React.createElement(GrammarTemplate, { data: data as any });
 
 export const grammarPlugin: ContentTypePlugin = {
   id: 'grammar',
