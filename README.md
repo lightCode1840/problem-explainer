@@ -61,11 +61,35 @@ npm run dev
 
 ## 开发指南
 
-- **数据结构与图解**：动画组件存放在 `src/components/visualizers/`，支持 `ArrayVisualizer`、`TreeVisualizer`、`LinkedListVisualizer`、`GridVisualizer`、`GraphVisualizer`、`ComparisonVisualizer`、`TimelineVisualizer`。
-- **题目类型模板**：存放于 `src/templates/`，目前支持 `LeetCodeTemplate`（编程题单题图解）、`GrammarTemplate`（英语语法多题模式）、`JavaInterviewTemplate`（Java八股文多题模式）。
-- **编辑器组件**：存放于 `src/components/editor/`，包含 `ProblemEditor`（语法/八股）、`ProgrammingEditor`（算法题）、`BatchEditor`（批量解析模式）。
-- **用户设置**：位于 `src/services/apiConfig.ts`。API Key、baseURL、默认模型、TTS 语音角色均通过此模块持久化到 localStorage。
-- **大模型提示词**：位于 `src/services/llm.ts`。修改大模型的输出格式或角色设定请在这里进行。
-- **TTS 音频生成**：位于 `src/services/tts.ts`。文本在合成语音前会进行净化（移除 Markdown 符号和填空下划线）以保证发音自然。
-- **渲染与导出队列**：位于 `src/services/exportQueue.ts`（单条视频）和 `src/services/batchQueue.ts`（批量解析）。采用后端轮询模式避免本地 CPU 过载。
-- **暗色模式**：通过 `src/hooks/useTheme.ts` Hook 管理，读写 `localStorage('pex_theme')`，切换 `<html class="dark">`。
+### 插件系统
+题型以插件形式注册于 `src/plugins/registry.ts`，每个插件实现 `ContentTypePlugin` 接口（`src/plugins/types.ts`），包含 `buildSystemPrompt`、`parseResponse`、`EditorComponent`、`templates` 等字段。目前有三个插件：`java_interview`、`grammar`、`leetcode`，分别位于 `src/plugins/` 对应子目录。
+
+新增题型时：在 `src/plugins/<type>/` 创建 `index.ts`（插件定义）和 `prompt.ts`（系统提示词），然后在 `registry.ts` 注册。
+
+### 状态管理
+`src/stores/` 下有三个 React Context：`videoStore`（videoData）、`workflowStore`（isGeneratingAudio/isExporting）、`pluginStore`（activePlugin/allPlugins）。
+
+### 视频模板
+模板存放于 `src/templates/`，是纯 Remotion 组件，所有状态由 props 传入。**注意：`src/Composition.tsx` 不得导入 `plugins/registry`**，否则编辑器组件会被打入 Remotion bundle 导致导出失败。
+
+- `LeetCodeTemplate`：编程题单题图解
+- `GrammarTemplate`：英语语法多题模式
+- `JavaInterviewTemplate`：Java 八股文，左考点 + 右图解 + 底部滚屏解析
+
+### 数据结构可视化
+动画组件存放在 `src/components/visualizers/`，支持 Array / Tree / LinkedList / Grid / Graph / Comparison / Timeline。
+
+### 服务层
+- `src/services/apiConfig.ts` — API Key / baseURL / 默认模型 / TTS 角色，localStorage 持久化
+- `src/services/llm.ts` — 大模型调用（OpenAI 兼容），含流式和非流式版本
+- `src/services/tts.ts` — TTS 音频生成 + 文本净化 + 字幕时间戳估算
+- `src/services/historyStore.ts` — 解析历史，最多 50 条，key: `pex_history`
+- `src/services/licenseStore.ts` — Free/Pro 分级，7 天离线宽限
+- `src/services/exportQueue.ts` — 单条视频后台渲染队列
+- `src/services/batchQueue.ts` — 批量解析队列，透传用户 API Key
+
+### 主题
+`src/themes/tokens.ts` 导出 `THEMES` 对象（`dark-code`、`light-clean`、`blue-tech`）。
+
+### 暗色模式
+通过 `src/hooks/useTheme.ts` Hook 管理，读写 `localStorage('pex_theme')`，切换 `<html class="dark">`。
