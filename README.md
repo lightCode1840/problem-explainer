@@ -1,167 +1,103 @@
-# 码帧 TutorReel — AI 题目解析与视频生成系统
+# TutorReel — AI 题目讲解短视频生成工具
 
-这是一个基于 Remotion、React 和 Tailwind CSS 构建的自动化题目解析和视频生成平台。该系统能够接入大语言模型（如 DeepSeek），自动将编程算法题、英语语法题、Java 八股文等解析为带有动态图解和拟人化语音讲解的短视频。
+粘贴题目，AI 自动拆解知识点、生成配音与可视化动画，一键导出 MP4 讲解视频。支持 LeetCode 算法题、英语语法、Java 面试等多种题型。
 
-## 核心能力
+## 主要功能
 
-- **AI 智能解析**：一键输入力扣题目，自动生成解题思路和分步图解。
-- **多图解同屏渲染**：支持在视频中同时渲染多种数据结构动画（如二叉树和辅助队列同步推演）。
-- **智能语音合成 (TTS)**：内置 `node-edge-tts` 引擎，支持“双轨制”文案（字幕精简、配音拟人化）。
-- **音画自动同步**：根据配音时长自动动态调整视频帧率与图解动画速度。
-- **一键导出 MP4**：基于 `ffprobe` 和 Remotion 后台渲染，支持导出高清 MP4 视频。
+- **多模型接入** — 支持 DeepSeek、GPT、Qwen 等主流大模型，自由切换
+- **自动配音** — 字幕与语音分离设计，字幕简洁可读，语音自然流畅
+- **可视化动画** — 数组、树、链表等数据结构随讲解步骤自动推进，高亮与指针同步更新
+- **多题型支持** — 内置 LeetCode 算法题、英语语法、Java 面试题三种模板，可扩展
+- **内容可编辑** — AI 生成的脚本和动画状态支持手动调整
+- **本地运行** — 数据在本地处理，无需上传云端
 
 ## 技术栈
 
-- **前端**：React, Vite, Tailwind CSS
-- **视频引擎**：Remotion
-- **后端**：Express.js, Node.js (`tsx watch` 热更新)
-- **大模型**：DeepSeek (通过 OpenAI 兼容接口)
-- **测试**：Playwright (E2E 测试)
-
-## 分发方式
-
-| 方式 | 适合对象 | 命令 |
-|------|----------|------|
-| **桌面应用（推荐）** | 普通用户 | `npm run dist:mac` / `npm run dist:win` |
-| **网页模式** | 本地使用 | `npm run build && npm start` → 浏览器打开 |
-| **开发模式** | 开发者 | `npm run dev` |
-
----
+| 层级 | 技术 |
+|------|------|
+| 前端框架 | React + Vite + Tailwind CSS |
+| 视频引擎 | Remotion |
+| 桌面壳 | Electron |
+| 后端服务 | Express.js + Node.js |
+| AI 接口 | OpenAI 兼容协议（DeepSeek / GPT / Qwen） |
+| TTS 引擎 | edge-tts（内置 `node-edge-tts`） |
 
 ## 快速开始
 
 ### 前置要求
 
-| 工具 | 版本 | 安装 |
-|------|------|------|
-| Node.js | 18+ | https://nodejs.org |
-| FFmpeg | 任意 | macOS: `brew install ffmpeg` · Windows: `winget install ffmpeg` |
+- Node.js 18+
+- FFmpeg（macOS: `brew install ffmpeg` · Windows: `winget install ffmpeg`）
 
-### 第一步：下载代码
+### 安装与运行
 
 ```bash
-git clone <仓库地址>
-cd problem-explainer
-```
+# 下载代码
+git clone https://github.com/lightCode1840/TutorReel.git
+cd TutorReel
 
-或直接下载 ZIP 解压。
-
-### 第二步：安装依赖
-
-```bash
+# 安装依赖
 npm install
-```
 
-### 第三步：配置 API Key
-
-将 `.env.example` 复制为 `.env`，填入你的大模型 API Key：
-
-```bash
+# 配置 API Key
 cp .env.example .env
+# 编辑 .env，填入你的 API Key
+
+# 构建并启动
+npm run build
+npm start
 ```
 
-```env
-# 大模型（DeepSeek / OpenAI 兼容接口均可）
-OPENAI_API_KEY=你的_api_key
-OPENAI_BASE_URL=https://api.deepseek.com
-
-# License Key（购买后填入，不填默认 Free 版）
-VALID_LICENSE_KEYS=PEX-XXXX-XXXX-XXXX
-```
-
-### 第四步：构建并启动
-
-```bash
-npm run build    # 构建前端（约 30 秒）
-npm start        # 启动服务
-```
-
-启动后在浏览器打开 **http://localhost:3001**
+启动后浏览器打开 **http://localhost:3001**
 
 > 导出的 MP4 文件保存在项目根目录的 `out/` 文件夹。
 
----
+## 桌面应用
 
-## 打包为桌面应用（.dmg / .exe）
+提供 macOS（.dmg）和 Windows（.exe）安装包，即装即用，无需配置开发环境。
 
-### 前置要求
-
-除 Node.js + FFmpeg 外，还需要：
-- **macOS**：Xcode Command Line Tools（`xcode-select --install`）
-- **Windows**：无额外要求，nsis 由 electron-builder 自动下载
-
-### 打包步骤
+### 构建安装包
 
 ```bash
-# 安装依赖（首次）
-npm install
-
-# 填好 .env（API Key + License Keys）
-cp .env.example .env
-
-# 打包（在 macOS 上打 .dmg，在 Windows 上打 .exe）
 npm run dist:mac    # → dist-app/*.dmg
 npm run dist:win    # → dist-app/*.exe
 ```
 
-打包时间约 3–10 分钟（主要是 Remotion bundle 构建）。
+打包约 3–10 分钟。生成的安装包：
+- macOS：`TutorReel-1.0.0.dmg`（≈ 400–600 MB）
+- Windows：`TutorReel Setup 1.0.0.exe`
 
-生成的安装包在 `dist-app/` 目录：
-- macOS：`码帧 TutorReel-1.0.0.dmg`（约 400–600 MB）
-- Windows：`码帧 TutorReel Setup 1.0.0.exe`
-
-### 应用图标（可选）
-
-在 `build/` 目录放置：
-- `build/icon.icns`（macOS，1024×1024）
-- `build/icon.ico`（Windows，256×256）
-
-### 用户数据目录
-
-安装后，用户生成的文件保存在：
-- macOS：`~/Library/Application Support/码帧 TutorReel/`
-- Windows：`%APPDATA%\码帧 TutorReel\`
-
----
-
-### 开发模式（仅限开发者）
+## 开发
 
 ```bash
-npm run dev          # 启动 Vite + Express（两个进程）
-npm run electron:dev # 在 Electron 窗口中运行（先确保 npm run dev 已启动）
+npm run dev          # 启动 Vite + Express 开发模式
+npm run electron:dev # 在 Electron 窗口中预览（需先启动 npm run dev）
 ```
 
-## 开发指南
+## 项目结构概览
 
-### 插件系统
-题型以插件形式注册于 `src/plugins/registry.ts`，每个插件实现 `ContentTypePlugin` 接口（`src/plugins/types.ts`），包含 `buildSystemPrompt`、`parseResponse`、`EditorComponent`、`templates` 等字段。目前有三个插件：`java_interview`、`grammar`、`leetcode`，分别位于 `src/plugins/` 对应子目录。
+```
+src/
+├── plugins/          # 题型插件（leetcode / grammar / java_interview）
+│   ├── registry.ts   # 插件注册表
+│   └── types.ts      # ContentTypePlugin 接口定义
+├── stores/           # React Context 状态管理
+│   ├── videoStore.tsx
+│   ├── workflowStore.tsx
+│   └── pluginStore.tsx
+├── components/
+│   ├── editor/       # 题目编辑器（ProblemEditor / ProgrammingEditor / GrammarEditor）
+│   ├── visualizers/  # 数据结构动画组件（Array / Tree / LinkedList / Grid / Graph）
+│   └── ui/           # 通用 UI 组件（Sidebar / TopBar / Modal / Toast）
+├── templates/        # Remotion 视频模板
+│   ├── LeetCodeTemplate.tsx
+│   ├── GrammarTemplate.tsx
+│   └── JavaInterviewTemplate.tsx
+├── services/         # 服务层（LLM / TTS / export / history / license）
+├── themes/           # 主题配置（dark-code / light-clean / blue-tech）
+└── hooks/            # 自定义 Hook（useTheme）
+```
 
-新增题型时：在 `src/plugins/<type>/` 创建 `index.ts`（插件定义）和 `prompt.ts`（系统提示词），然后在 `registry.ts` 注册。
+## License
 
-### 状态管理
-`src/stores/` 下有三个 React Context：`videoStore`（videoData）、`workflowStore`（isGeneratingAudio/isExporting）、`pluginStore`（activePlugin/allPlugins）。
-
-### 视频模板
-模板存放于 `src/templates/`，是纯 Remotion 组件，所有状态由 props 传入。**注意：`src/Composition.tsx` 不得导入 `plugins/registry`**，否则编辑器组件会被打入 Remotion bundle 导致导出失败。
-
-- `LeetCodeTemplate`：编程题单题图解
-- `GrammarTemplate`：英语语法多题模式
-- `JavaInterviewTemplate`：Java 八股文，左考点 + 右图解 + 底部滚屏解析
-
-### 数据结构可视化
-动画组件存放在 `src/components/visualizers/`，支持 Array / Tree / LinkedList / Grid / Graph / Comparison / Timeline。
-
-### 服务层
-- `src/services/apiConfig.ts` — API Key / baseURL / 默认模型 / TTS 角色，localStorage 持久化
-- `src/services/llm.ts` — 大模型调用（OpenAI 兼容），含流式和非流式版本
-- `src/services/tts.ts` — TTS 音频生成 + 文本净化 + 字幕时间戳估算
-- `src/services/historyStore.ts` — 解析历史，最多 50 条，key: `pex_history`
-- `src/services/licenseStore.ts` — Free/Pro 分级，7 天离线宽限
-- `src/services/exportQueue.ts` — 单条视频后台渲染队列
-- `src/services/batchQueue.ts` — 批量解析队列，透传用户 API Key
-
-### 主题
-`src/themes/tokens.ts` 导出 `THEMES` 对象（`dark-code`、`light-clean`、`blue-tech`）。
-
-### 暗色模式
-通过 `src/hooks/useTheme.ts` Hook 管理，读写 `localStorage('pex_theme')`，切换 `<html class="dark">`。
+MIT
