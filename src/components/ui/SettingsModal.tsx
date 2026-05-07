@@ -5,12 +5,11 @@ import { ApiConfig, PRESETS, getApiConfig, saveApiConfig } from '../../services/
 interface SettingsModalProps {
   open: boolean;
   onClose: () => void;
-  onLicenseOpen?: () => void;
 }
 
 type TestStatus = 'idle' | 'testing' | 'success' | 'error';
 
-export const SettingsModal: React.FC<SettingsModalProps> = ({ open, onClose, onLicenseOpen }) => {
+export const SettingsModal: React.FC<SettingsModalProps> = ({ open, onClose }) => {
   const [preset, setPreset] = useState<ApiConfig['preset']>('deepseek');
   const [apiKey, setApiKey] = useState('');
   const [baseURL, setBaseURL] = useState(PRESETS.deepseek.baseURL);
@@ -48,7 +47,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ open, onClose, onL
     setTestStatus('testing');
     setTestMessage('');
     try {
-      const res = await fetch('http://localhost:3001/api/test-config', {
+      const res = await fetch('/api/test-config', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ apiKey, baseURL }),
@@ -121,7 +120,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ open, onClose, onL
                   onClick={() => handlePresetChange(p)}
                   className={`py-2.5 px-3 rounded-xl text-sm font-semibold border-2 transition-all duration-150 ${
                     preset === p
-                      ? 'border-indigo-500 bg-indigo-50 dark:bg-indigo-500/10 text-indigo-700 dark:text-indigo-400'
+                      ? 'border-cyan-500 bg-cyan-50 dark:bg-cyan-500/10 text-cyan-700 dark:text-cyan-400'
                       : 'border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-gray-600 dark:text-zinc-400 hover:border-gray-300 dark:hover:border-zinc-600'
                   }`}
                 >
@@ -140,7 +139,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ open, onClose, onL
                 value={apiKey}
                 onChange={(e) => { setApiKey(e.target.value); setTestStatus('idle'); }}
                 placeholder="sk-..."
-                className="w-full px-4 py-3 pr-12 bg-gray-50 dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 rounded-xl text-gray-900 dark:text-zinc-100 placeholder-gray-400 dark:placeholder-zinc-500 focus:bg-white dark:focus:bg-zinc-800 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-colors text-sm font-mono"
+                className="w-full px-4 py-3 pr-12 bg-gray-50 dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 rounded-xl text-gray-900 dark:text-zinc-100 placeholder-gray-400 dark:placeholder-zinc-500 focus:bg-white dark:focus:bg-zinc-800 focus:ring-2 focus:ring-cyan-500/20 focus:border-cyan-500 outline-none transition-colors text-sm font-mono"
               />
               <button
                 type="button"
@@ -170,7 +169,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ open, onClose, onL
               value={baseURL}
               onChange={(e) => { setBaseURL(e.target.value); setTestStatus('idle'); }}
               placeholder="https://api.deepseek.com"
-              className="w-full px-4 py-3 bg-gray-50 dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 rounded-xl text-gray-900 dark:text-zinc-100 placeholder-gray-400 dark:placeholder-zinc-500 focus:bg-white dark:focus:bg-zinc-800 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-colors text-sm font-mono"
+              className="w-full px-4 py-3 bg-gray-50 dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 rounded-xl text-gray-900 dark:text-zinc-100 placeholder-gray-400 dark:placeholder-zinc-500 focus:bg-white dark:focus:bg-zinc-800 focus:ring-2 focus:ring-cyan-500/20 focus:border-cyan-500 outline-none transition-colors text-sm font-mono"
             />
           </div>
 
@@ -206,24 +205,11 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ open, onClose, onL
             <p className="text-xs text-gray-500 dark:text-zinc-400 leading-relaxed">
               <span className="font-semibold text-gray-600 dark:text-zinc-300">使用提示：</span>
               配置后，所有 AI 解析请求将使用此 API Key 和服务商。若留空，将使用后端{' '}
-              <code className="font-mono text-indigo-600 dark:text-indigo-400">.env</code>{' '}
+              <code className="font-mono text-cyan-600 dark:text-cyan-400">.env</code>{' '}
               中的默认配置。
             </p>
           </div>
         </div>
-
-        {/* License entry */}
-        {onLicenseOpen && (
-          <div className="px-6 pb-4">
-            <button
-              onClick={() => { onClose(); onLicenseOpen(); }}
-              className="w-full py-2.5 px-4 rounded-xl text-sm font-medium border border-gray-200 dark:border-zinc-700 text-gray-600 dark:text-zinc-300 hover:bg-gray-50 dark:hover:bg-zinc-800 transition-colors flex items-center gap-2"
-            >
-              <span>🔑</span>
-              License 激活 / 查看授权状态
-            </button>
-          </div>
-        )}
 
         {/* Footer */}
         <div className="px-6 py-4 border-t border-gray-100 dark:border-zinc-800 flex items-center gap-3">
@@ -247,7 +233,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ open, onClose, onL
             className={`flex-1 py-2.5 px-4 rounded-xl text-sm font-bold transition-all flex items-center justify-center gap-2 ${
               saved
                 ? 'bg-emerald-500 text-white'
-                : 'bg-indigo-600 hover:bg-indigo-700 text-white'
+                : 'bg-cyan-600 hover:bg-cyan-700 text-white'
             }`}
           >
             {saved ? (

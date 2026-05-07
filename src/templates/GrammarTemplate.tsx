@@ -4,9 +4,10 @@ import { GrammarProblemData } from '../types/problem';
 
 interface Props {
   data: GrammarProblemData;
+  isDark?: boolean;
 }
 
-export const GrammarTemplate: React.FC<Props> = ({ data }) => {
+export const GrammarTemplate: React.FC<Props> = ({ data, isDark = false }) => {
   const frame = useCurrentFrame();
   const { fps, durationInFrames } = useVideoConfig();
 
@@ -15,9 +16,9 @@ export const GrammarTemplate: React.FC<Props> = ({ data }) => {
   const revealAnswerFrame = Math.min(1.5 * fps, durationInFrames * 0.2);
 
   return (
-    <AbsoluteFill className="bg-white items-center justify-center p-16 font-sans">
+    <AbsoluteFill className={`${isDark ? 'bg-[#0f0f11]' : 'bg-white'} items-center justify-center p-16 font-sans`}>
       <div className="w-full max-w-4xl">
-        <h1 className="text-5xl font-bold text-gray-800 mb-12 text-center leading-relaxed">
+        <h1 className={`text-5xl font-bold ${isDark ? 'text-gray-100' : 'text-gray-800'} mb-12 text-center leading-relaxed`}>
           {data.question}
         </h1>
 
@@ -26,17 +27,18 @@ export const GrammarTemplate: React.FC<Props> = ({ data }) => {
             const isCorrect = idx === data.correctAnswer;
             const isRevealed = frame >= revealAnswerFrame;
             
-            let bgColor = "bg-gray-100";
-            let textColor = "text-gray-700";
-            let borderColor = "border-transparent";
+            let bgColor = isDark ? "bg-[#18181b]" : "bg-gray-100";
+            let textColor = isDark ? "text-gray-300" : "text-gray-700";
+            let borderColor = isDark ? "border-gray-800" : "border-transparent";
 
             if (isRevealed && isCorrect) {
-              bgColor = "bg-green-100";
-              textColor = "text-green-800";
-              borderColor = "border-green-500";
+              bgColor = isDark ? "bg-green-900/30" : "bg-green-100";
+              textColor = isDark ? "text-green-400" : "text-green-800";
+              borderColor = isDark ? "border-green-500/50" : "border-green-500";
             } else if (isRevealed && !isCorrect) {
-              bgColor = "bg-gray-50";
-              textColor = "text-gray-400";
+              bgColor = isDark ? "bg-[#0f0f11]" : "bg-gray-50";
+              textColor = isDark ? "text-gray-600" : "text-gray-400";
+              borderColor = isDark ? "border-gray-900" : "border-transparent";
             }
 
             return (
@@ -44,7 +46,7 @@ export const GrammarTemplate: React.FC<Props> = ({ data }) => {
                 key={idx}
                 className={`p-6 rounded-2xl border-4 text-3xl font-medium transition-all duration-500 ${bgColor} ${textColor} ${borderColor} flex items-center shadow-sm`}
               >
-                <span className="mr-6 font-bold text-blue-500">{String.fromCharCode(65 + idx)}.</span>
+                <span className={`mr-6 font-bold ${isDark ? 'text-cyan-500' : 'text-blue-500'}`}>{String.fromCharCode(65 + idx)}.</span>
                 {opt}
               </div>
             );
@@ -52,7 +54,7 @@ export const GrammarTemplate: React.FC<Props> = ({ data }) => {
         </div>
 
         {frame >= revealAnswerFrame && (
-          <div className="mt-16 p-8 bg-blue-50 rounded-2xl text-2xl text-blue-900 leading-relaxed animate-fade-in">
+          <div className={`mt-16 p-8 ${isDark ? 'bg-cyan-900/20 text-cyan-100 border border-cyan-900/50' : 'bg-blue-50 text-blue-900'} rounded-2xl text-2xl leading-relaxed animate-fade-in`}>
             <span className="font-bold mr-2">解析：</span>
             {data.explanation}
           </div>

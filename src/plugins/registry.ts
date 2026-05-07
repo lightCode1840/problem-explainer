@@ -9,9 +9,9 @@ function register(plugin: ContentTypePlugin): void {
   plugins.set(plugin.id, plugin);
 }
 
+register(leetcodePlugin);
 register(javaInterviewPlugin);
 register(grammarPlugin);
-register(leetcodePlugin);
 
 export const registry = {
   register,

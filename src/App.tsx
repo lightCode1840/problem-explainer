@@ -12,10 +12,8 @@ import { usePluginStore } from './stores/pluginStore';
 import { useTheme } from './hooks/useTheme';
 import { hasApiConfig, getApiConfigForRequest } from './services/apiConfig';
 import { LeetCodeProblemData } from './types/problem';
-import { getCurrentTier } from './services/licenseStore';
 import { addToHistory } from './services/historyStore';
 import { HistoryPanel } from './components/ui/HistoryPanel';
-import { LicenseModal } from './components/ui/LicenseModal';
 
 export const App: React.FC = () => {
   const { isDark, toggleTheme } = useTheme();
@@ -26,9 +24,9 @@ export const App: React.FC = () => {
   const { toastMessage, showToast, setToastMessage } = useToast();
 
   const [settingsOpen, setSettingsOpen] = useState(false);
-  const [licenseOpen, setLicenseOpen] = useState(false);
   const [apiConfigured, setApiConfigured] = useState(hasApiConfig);
-  const [activeSection, setActiveSection] = useState<string>(allPlugins[0]?.id ?? 'java_interview');
+  const [activeSection, setActiveSection] = useState<string>(allPlugins[0]?.id ?? 'leetcode');
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
   const handleSectionChange = (section: string) => {
     setActiveSection(section);
@@ -55,7 +53,7 @@ export const App: React.FC = () => {
         body.explanation = iv.explanation;
       }
 
-      const res = await fetch('http://localhost:3001/api/generate-audio', {
+      const res = await fetch('/api/generate-audio', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(body),
@@ -78,11 +76,10 @@ export const App: React.FC = () => {
     setExportProgress(0);
     setExportStatus('pending');
     try {
-      const tier = getCurrentTier();
-      const res = await fetch('http://localhost:3001/api/export', {
+      const res = await fetch('/api/export', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ videoData, showWatermark: tier === 'free' }),
+        body: JSON.stringify({ videoData, showWatermark: false }),
       });
       if (!res.ok) throw new Error('Export request failed');
 
@@ -91,7 +88,7 @@ export const App: React.FC = () => {
 
       const poll = setInterval(async () => {
         try {
-          const statusRes = await fetch(`http://localhost:3001/api/export/status/${taskId}`);
+          const statusRes = await fetch(`/api/export/status/${taskId}`);
           if (!statusRes.ok) return;
           const task = await statusRes.json();
           setExportProgress(task.progress);
@@ -101,7 +98,7 @@ export const App: React.FC = () => {
             clearInterval(poll);
             setIsExporting(false);
             showToast('导出完成', '视频已渲染完毕，即将下载。', 'success');
-            window.open(`http://localhost:3001${task.outputUrl}`, '_blank');
+            window.open(`${task.outputUrl}`, '_blank');
           } else if (task.status === 'failed') {
             clearInterval(poll);
             setIsExporting(false);
@@ -116,22 +113,20 @@ export const App: React.FC = () => {
     }
   };
 
-  const tier = getCurrentTier();
   const EditorComponent = activePlugin?.EditorComponent;
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-zinc-950 font-sans text-gray-900 dark:text-zinc-100">
       <TopBar onSettingsOpen={() => setSettingsOpen(true)} isDark={isDark} onThemeToggle={toggleTheme} />
-      <Sidebar plugins={allPlugins} activeSection={activeSection} onSelect={handleSectionChange} />
+      <Sidebar plugins={allPlugins} activeSection={activeSection} onSelect={handleSectionChange}
+        collapsed={sidebarCollapsed} onToggleCollapse={() => setSidebarCollapsed(v => !v)} />
       <SettingsModal
         open={settingsOpen}
         onClose={() => { setSettingsOpen(false); setApiConfigured(hasApiConfig()); }}
-        onLicenseOpen={() => setLicenseOpen(true)}
       />
-      <LicenseModal open={licenseOpen} onClose={() => setLicenseOpen(false)} />
       <Toast message={toastMessage} onClose={() => setToastMessage(null)} />
 
-      <div className="pl-16 pt-16 min-h-screen">
+      <div className={`${sidebarCollapsed ? 'pl-14' : 'pl-44'} pt-16 min-h-screen transition-[padding] duration-300 ease-in-out`}>
         {activeSection === 'batch' ? (
           <div className="p-6"><BatchEditor /></div>
         ) : activeSection === 'history' ? (
@@ -170,30 +165,11 @@ export const App: React.FC = () => {
 
             {/* Preview panel ~55% */}
             <div className="flex-1 overflow-y-auto p-6 flex flex-col gap-4">
-              {/* Visual style selector */}
-              {activePlugin && activePlugin.templates.length > 1 && (
-                <div className="flex items-center gap-2 flex-wrap">
-                  {activePlugin.templates.map(tpl => (
-                    <button
-                      key={tpl.id}
-                      onClick={() => setVideoData({ ...videoData, templateId: tpl.id })}
-                      className={`px-3 py-1.5 rounded-lg text-xs font-medium border transition-colors ${
-                        (videoData.templateId ?? activePlugin.defaultTemplateId) === tpl.id
-                          ? 'border-indigo-500 bg-indigo-50 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300'
-                          : 'border-gray-200 dark:border-zinc-700 text-gray-500 dark:text-zinc-400 hover:border-gray-300'
-                      }`}
-                    >
-                      {tpl.name}
-                    </button>
-                  ))}
-                </div>
-              )}
-
               <div className="bg-white dark:bg-zinc-900 rounded-xl border border-gray-200 dark:border-zinc-800 overflow-hidden">
                 <div className="bg-zinc-950 aspect-video relative">
                   <Player
-                    component={GenericExplainerVideo as React.FC<{ data: typeof videoData; showWatermark?: boolean }>}
-                    inputProps={{ data: videoData, showWatermark: tier === 'free' }}
+                    component={GenericExplainerVideo as React.FC<{ data: typeof videoData; showWatermark?: boolean; isDark?: boolean }>}
+                    inputProps={{ data: videoData, showWatermark: false, isDark }}
                     durationInFrames={videoData.durationInFrames || 500}
                     fps={30}
                     compositionWidth={1920}
@@ -233,11 +209,6 @@ export const App: React.FC = () => {
                       已有配音
                     </span>
                   )}
-                  {tier === 'free' && (
-                    <span className="text-xs text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/30 px-2 py-0.5 rounded-md">
-                      Free 版（含水印）
-                    </span>
-                  )}
                 </div>
               </div>
 
@@ -245,7 +216,7 @@ export const App: React.FC = () => {
                 <button
                   onClick={handleGenerateAudio}
                   disabled={isGeneratingAudio}
-                  className="flex-1 flex items-center justify-center gap-2 py-3 px-4 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-60 disabled:cursor-not-allowed text-white text-sm font-semibold rounded-xl transition-colors"
+                  className="flex-1 flex items-center justify-center gap-2 py-3 px-4 bg-cyan-600 hover:bg-cyan-700 disabled:opacity-60 disabled:cursor-not-allowed text-white text-sm font-semibold rounded-xl transition-colors"
                 >
                   {isGeneratingAudio ? (
                     <>
@@ -296,7 +267,7 @@ export const App: React.FC = () => {
                   </div>
                   <div className="w-full bg-gray-100 dark:bg-zinc-800 rounded-full h-1.5">
                     <div
-                      className="bg-indigo-600 h-1.5 rounded-full transition-all duration-300"
+                      className="bg-cyan-600 h-1.5 rounded-full transition-all duration-300"
                       style={{ width: `${exportProgress * 100}%` }}
                     />
                   </div>

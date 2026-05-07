@@ -59,9 +59,9 @@ export const TimelineVisualizer: React.FC<Props> = ({ timelineData, activeStepIn
                 <div 
                   className={`w-12 h-12 rounded-full border-4 flex items-center justify-center font-bold shadow-sm transition-all duration-500 z-10 shrink-0
                     ${isActive 
-                      ? 'bg-indigo-500 border-indigo-200 text-white shadow-indigo-200/50 shadow-lg scale-110' 
+                      ? 'bg-cyan-500 border-cyan-200 text-white shadow-cyan-200/50 shadow-lg scale-110' 
                       : hasPassed 
-                        ? 'bg-white border-indigo-400 text-indigo-500' 
+                        ? 'bg-white border-cyan-400 text-cyan-500' 
                         : 'bg-white border-slate-300 text-slate-400'
                     }`}
                 >
@@ -72,17 +72,17 @@ export const TimelineVisualizer: React.FC<Props> = ({ timelineData, activeStepIn
                 <div 
                   className={`flex-1 p-5 rounded-2xl border transition-all duration-500 shadow-sm
                     ${isActive 
-                      ? 'bg-indigo-50 border-indigo-200 shadow-indigo-100/50 -translate-y-1' 
+                      ? 'bg-cyan-50 border-cyan-200 shadow-cyan-100/50 -translate-y-1' 
                       : 'bg-white border-slate-200'
                     }`}
                 >
                   <h4 className={`text-xl font-bold mb-2 transition-colors duration-300 ${
-                    isActive ? 'text-indigo-700' : 'text-slate-700'
+                    isActive ? 'text-cyan-700' : 'text-slate-700'
                   }`}>
                     {event.title}
                   </h4>
                   <p className={`text-lg leading-relaxed transition-colors duration-300 ${
-                    isActive ? 'text-indigo-600/90' : 'text-slate-500'
+                    isActive ? 'text-cyan-600/90' : 'text-slate-500'
                   }`}>
                     {event.description}
                   </p>

@@ -1,5 +1,5 @@
 import React from 'react';
-import { BookOpen } from 'lucide-react';
+import { FileText } from 'lucide-react';
 import { ContentTypePlugin, TemplateProps } from '../types';
 import { buildJavaInterviewSystemPrompt } from './prompt';
 import { ProblemEditor } from '../../components/editor/ProblemEditor';
@@ -11,19 +11,19 @@ const defaultTheme = {
   cardBg: '#18181b',
   textPrimary: '#f4f4f5',
   textSecondary: '#71717a',
-  accent: '#6366f1',
+  accent: '#22B8CF',
   borderColor: '#27272a',
   codeFont: 'ui-monospace, monospace',
 };
 
-const JavaInterviewTemplateAdapter: React.FC<TemplateProps> = ({ data }) =>
+const JavaInterviewTemplateAdapter: React.FC<TemplateProps> = ({ data, isDark }) =>
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  React.createElement(JavaInterviewTemplate, { data: data as any });
+  React.createElement(JavaInterviewTemplate, { data: data as any, isDark });
 
 export const javaInterviewPlugin: ContentTypePlugin = {
   id: 'java_interview',
-  displayName: '八股 / 面试题',
-  Icon: BookOpen,
+  displayName: '面试题解',
+  Icon: FileText,
   buildSystemPrompt: () => buildJavaInterviewSystemPrompt(),
   parseResponse: (raw: string): JavaInterviewProblemData => {
     const parsed = JSON.parse(raw) as JavaInterviewProblemData;
@@ -31,11 +31,11 @@ export const javaInterviewPlugin: ContentTypePlugin = {
     return parsed;
   },
   EditorComponent: ProblemEditor,
-  defaultTemplateId: 'dark-tech',
+  defaultTemplateId: 'default',
   templates: [
     {
-      id: 'dark-tech',
-      name: '深色科技风',
+      id: 'default',
+      name: '默认',
       theme: defaultTheme,
       Component: JavaInterviewTemplateAdapter,
     },

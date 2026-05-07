@@ -1,10 +1,11 @@
 {
-  "name": "problem-explainer",
+  "name": "tutorreel",
   "version": "1.0.0",
-  "description": "My Remotion video",
+  "description": "码帧 TutorReel — 将题目文本转化为讲解短视频",
   "repository": {},
   "license": "UNLICENSED",
   "private": true,
+  "main": "dist-electron/main.js",
   "dependencies": {
     "@remotion/cli": "4.0.454",
     "@remotion/player": "^4.0.454",
@@ -32,6 +33,9 @@
     "@types/web": "0.0.166",
     "@vitejs/plugin-react": "^6.0.1",
     "concurrently": "^9.2.1",
+    "electron": "^41.5.0",
+    "electron-builder": "^26.8.1",
+    "esbuild": "^0.28.0",
     "eslint": "9.19.0",
     "prettier": "3.8.1",
     "tsx": "^4.21.0",
@@ -42,10 +46,84 @@
     "dev:web": "vite",
     "dev:server": "tsx watch src/server.ts",
     "dev": "concurrently \"npm run dev:server\" \"npm run dev:web\"",
+    "build:web": "vite build",
+    "build:remotion": "remotion bundle src/index.ts && node -e \"var f=require('fs');var p='build/index.html';if(!f.existsSync(p)||f.statSync(p).size===0){console.error('ERROR: Remotion bundle failed - build/index.html missing or empty');process.exit(1);}else{console.log('Remotion bundle verified: '+f.statSync(p).size+' bytes');}\"",
+    "build:server-bundle": "esbuild src/server.ts --bundle --packages=external --platform=node --target=node18 --format=cjs --outfile=dist-electron/server.cjs",
+    "build:main-bundle": "esbuild electron/main.ts --bundle --packages=external --platform=node --external:electron --format=cjs --outfile=dist-electron/main.js && esbuild electron/preload.ts --bundle --packages=external --platform=node --external:electron --format=cjs --outfile=dist-electron/preload.js",
+    "build": "npm run build:web && npm run build:remotion && npm run build:server-bundle && npm run build:main-bundle",
+    "start": "tsx src/server.ts",
+    "electron:dev": "npm run build:main-bundle && electron dist-electron/main.js",
+    "dist": "npm run build && electron-builder",
+    "dist:mac": "npm run build && electron-builder --mac",
+    "dist:win": "npm run build && electron-builder --win",
     "studio": "remotion studio",
-    "build": "remotion bundle",
     "upgrade": "remotion upgrade",
     "lint": "eslint src && tsc"
+  },
+  "build": {
+    "appId": "com.tutorreel.app",
+    "productName": "码帧 TutorReel",
+    "copyright": "Copyright © 2026 TutorReel",
+    "directories": {
+      "output": "dist-app"
+    },
+    "files": [
+      "dist-electron/**",
+      "node_modules/**",
+      "!node_modules/.cache/**",
+      "!node_modules/.bin/**"
+    ],
+    "asarUnpack": [
+      "node_modules/@remotion/compositor-*/**",
+      "node_modules/get-audio-duration/**"
+    ],
+    "extraResources": [
+      {
+        "from": "dist",
+        "to": "dist"
+      },
+      {
+        "from": "build",
+        "to": "remotion-bundle"
+      }
+    ],
+    "mac": {
+      "category": "public.app-category.video",
+      "target": [
+        {
+          "target": "dmg",
+          "arch": [
+            "arm64",
+            "x64"
+          ]
+        }
+      ],
+      "icon": "build/icon.icns"
+    },
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "icon": "build/icon.ico"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true
+    },
+    "dmg": {
+      "title": "码帧 TutorReel",
+      "window": {
+        "width": 540,
+        "height": 380
+      }
+    }
   },
   "sideEffects": [
     "*.css"

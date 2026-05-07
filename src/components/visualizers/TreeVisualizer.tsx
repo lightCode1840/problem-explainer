@@ -177,10 +177,10 @@ export const TreeVisualizer: React.FC<Props> = ({ prevState, currState, progress
                 marginLeft: '-50px'
               }}
             >
-              <div className="bg-indigo-500 text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg text-center w-max mb-1 whitespace-nowrap">
+              <div className="bg-cyan-500 text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg text-center w-max mb-1 whitespace-nowrap">
                 {name}
               </div>
-              <svg className="w-6 h-6 text-indigo-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <svg className="w-6 h-6 text-cyan-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
               </svg>
             </div>

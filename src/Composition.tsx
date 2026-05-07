@@ -8,7 +8,7 @@ import { LeetCodeTemplate } from './templates/LeetCodeTemplate';
 // Video-only routing — avoids importing the plugin registry to keep editor
 // components out of the Remotion render bundle.
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-const templateMap: Record<string, React.ComponentType<{ data: any }>> = {
+const templateMap: Record<string, React.ComponentType<{ data: any; isDark?: boolean }>> = {
   grammar: GrammarTemplate,
   java_interview: JavaInterviewTemplate,
   leetcode: LeetCodeTemplate,
@@ -17,15 +17,16 @@ const templateMap: Record<string, React.ComponentType<{ data: any }>> = {
 interface Props {
   data: AnyProblemData;
   showWatermark?: boolean;
+  isDark?: boolean;
 }
 
-export const GenericExplainerVideo: React.FC<Props> = ({ data, showWatermark = false }) => {
+export const GenericExplainerVideo: React.FC<Props> = ({ data, showWatermark = false, isDark = false }) => {
   const TemplateComponent = templateMap[data.type] ?? templateMap['java_interview'];
 
   return (
-    <AbsoluteFill>
+    <AbsoluteFill className={isDark ? 'dark' : ''}>
       {data.audioUrl && <Audio src={data.audioUrl} />}
-      <TemplateComponent data={data} />
+      <TemplateComponent data={data} isDark={isDark} />
       {showWatermark && (
         <AbsoluteFill style={{ pointerEvents: 'none', zIndex: 9999 }}>
           <div style={{
@@ -38,7 +39,7 @@ export const GenericExplainerVideo: React.FC<Props> = ({ data, showWatermark = f
               color: 'rgba(255,255,255,0.75)', fontSize: 20, fontWeight: 700,
               letterSpacing: '-0.3px', fontFamily: 'system-ui, sans-serif',
             }}>
-              Problem Explainer
+              TutorReel
             </span>
           </div>
         </AbsoluteFill>

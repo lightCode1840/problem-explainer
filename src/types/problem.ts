@@ -66,6 +66,12 @@ export interface TimelineData {
   }[];
 }
 
+export interface InterviewTips {
+  commonMistake?: string;   // 常见错误
+  followUp?: string;         // 可能的面试追问
+  realWorld?: string;        // 实际应用场景
+}
+
 export interface JavaInterviewProblemData extends BaseProblemData {
   type: 'java_interview';
   question: string;
@@ -74,7 +80,9 @@ export interface JavaInterviewProblemData extends BaseProblemData {
   graphData?: GraphData; // 结构图解数据
   comparisonData?: ComparisonData; // 表格对比数据
   timelineData?: TimelineData; // 时间轴/流程数据
-  explanation: string;
+  explanation: string | string[]; // 单段文本 或 分段数组（新格式推荐用数组）
+  interviewTips?: InterviewTips;  // 面试实战拓展
+  oneLiner?: string;              // 一句话金句总结
 }
 
 export interface AnimationStructure {
@@ -101,14 +109,29 @@ export interface VideoStyleConfig {
   textFontWeight: string; // Tailwind font weight classes (e.g., 'font-normal', 'font-medium', 'font-bold')
 }
 
+export interface ApproachOverview {
+  methodName: string;         // 如 "双指针法", "动态规划"
+  coreInsight: string;         // 核心洞察，一句话
+  whyBetter?: string;           // 为何优于暴力解（可选）
+}
+
+export interface Complexity {
+  timeComplexity: string;       // 如 "O(n)"
+  spaceComplexity: string;      // 如 "O(1)"
+  briefExplanation: string;     // 口语化解释
+}
+
 export interface LeetCodeProblemData extends BaseProblemData {
   type: 'leetcode';
   description: string;
   codeSnippet: string;
   language: string;
-  problemReading: string; // 读题部分的配音文案
-  steps: ProblemStep[]; // 替换原来的单段 explanation
-  explanation?: string; // 保留可选字段，兼容旧数据
+  problemReading: string;        // Phase 1: 读题部分的配音文案
+  approachOverview?: ApproachOverview;  // Phase 2: 思路解析
+  steps: ProblemStep[];          // Phase 3: 分步推演
+  complexity?: Complexity;       // Phase 4: 复杂度分析
+  summary?: string;              // Phase 5: 总结回顾
+  explanation?: string;          // 保留可选字段，兼容旧数据
   styleConfig?: VideoStyleConfig; // 视频展示样式配置
 }
 

@@ -170,7 +170,7 @@ export const GraphVisualizer: React.FC<GraphVisualizerProps> = ({ graphData, act
                 ? 'bg-orange-50 border-orange-500 text-orange-700 shadow-orange-500/30 z-20' 
                 : isSecondary 
                   ? 'bg-slate-100 border-slate-300 text-slate-500 z-10' 
-                  : 'bg-white border-indigo-200 text-indigo-900 z-10'
+                  : 'bg-white border-cyan-200 text-cyan-900 z-10'
               }`}
             style={{
               left: `${pos.x}%`,

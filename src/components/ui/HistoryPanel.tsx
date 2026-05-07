@@ -41,7 +41,7 @@ export const HistoryPanel: React.FC<HistoryPanelProps> = ({ onRestore }) => {
           {entries.map(entry => (
             <div key={entry.id}
               className="flex items-center gap-3 p-3 rounded-xl border border-gray-200 dark:border-zinc-800
-                bg-white dark:bg-zinc-900 hover:border-indigo-300 dark:hover:border-indigo-700 transition-colors group">
+                bg-white dark:bg-zinc-900 hover:border-cyan-300 dark:hover:border-cyan-700 transition-colors group">
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium text-gray-900 dark:text-zinc-100 truncate">{entry.title}</p>
                 <p className="text-xs text-gray-400 dark:text-zinc-500 mt-0.5">
@@ -50,7 +50,7 @@ export const HistoryPanel: React.FC<HistoryPanelProps> = ({ onRestore }) => {
               </div>
               <button
                 onClick={() => onRestore(entry.data)}
-                className="text-xs font-medium text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 opacity-0 group-hover:opacity-100 transition-opacity"
+                className="text-xs font-medium text-cyan-600 dark:text-cyan-400 hover:text-cyan-700 opacity-0 group-hover:opacity-100 transition-opacity"
               >
                 恢复
               </button>

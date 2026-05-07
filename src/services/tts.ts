@@ -5,7 +5,9 @@ import { getAudioDurationInSeconds } from 'get-audio-duration';
 import { EdgeTTS } from 'node-edge-tts';
 import { SubtitleSegment } from '../plugins/types';
 
-const outputDir = path.join(process.cwd(), "public", "voiceover");
+// In packaged Electron builds PEX_DATA_DIR points to the user's writable data dir.
+// Falls back to the project root for regular dev/server mode.
+const outputDir = path.join(process.env.PEX_DATA_DIR ?? process.cwd(), 'public', 'voiceover');
 
 export function estimateSubtitles(text: string, durationInSeconds: number): SubtitleSegment[] {
   const phrases = text.split(/(?<=[。！？\n])\s*/g).map(s => s.trim()).filter(Boolean);

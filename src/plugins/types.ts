@@ -20,6 +20,7 @@ export interface ThemeConfig {
 export interface TemplateProps {
   data: AnyProblemData;
   theme?: ThemeConfig;
+  isDark?: boolean;
 }
 
 export interface EditorProps {

@@ -157,13 +157,21 @@ class BatchQueue {
     // 3. Rendering (Wait for exportQueue)
     exportQueue.addTask(item.id, parsedData);
     
-    // Poll for export completion
+    // Poll for export completion (max 5-minute timeout)
+    const MAX_POLL_MS = 300_000;
+    const pollStart = Date.now();
     await new Promise<void>((resolve, reject) => {
       const interval = setInterval(() => {
         const status = exportQueue.getTask(item.id);
         if (!status) {
           clearInterval(interval);
           reject(new Error('Export task not found'));
+          return;
+        }
+
+        if (Date.now() - pollStart > MAX_POLL_MS) {
+          clearInterval(interval);
+          reject(new Error('Export timed out after 5 minutes'));
           return;
         }
 

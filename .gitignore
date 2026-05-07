@@ -8,6 +8,8 @@ dist
 # Remotion & Build output
 out
 build
+dist-app
+dist-electron
 
 # Logs
 *.log

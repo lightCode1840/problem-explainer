@@ -128,7 +128,17 @@ export async function parseProblemWithLLM(rawText: string, targetType: ProblemTy
       }
     ]
   },
-  "explanation": "这道题是Java面试中非常高频的基础题..."
+  "explanation": [
+    "第一段：核心定义——用简洁生动的语言讲清楚这个概念是什么，让观众30秒内听懂（40-60字）",
+    "第二段：底层原理——深入讲解机制的实现细节、JVM/框架层面的运作方式，可以有技术深度（60-100字）",
+    "第三段：实际应用——结合工程场景说明这个知识点的工程价值，如Spring框架中如何使用、性能优化等（40-60字）"
+  ],
+  "interviewTips": {
+    "commonMistake": "面试中候选人最常见的理解错误或易混淆点（20-40字）",
+    "followUp": "面试官可能的追问方向，也是展示深度的机会（20-40字）",
+    "realWorld": "该知识点在真实框架/项目中的具体应用场景（20-40字）"
+  },
+  "oneLiner": "一句10-25字的金句总结，让观众瞬间记住核心概念（如：编译看左边，运行看右边）"
 }
 
 注意：针对 java_interview 题型，请根据题目的性质，在 \`graphData\`、\`comparisonData\`、\`timelineData\` 这三种图解类型中**选择最合适的一种**返回（只需要返回其中一个即可！）。
@@ -189,7 +199,18 @@ export async function parseProblemWithLLM(rawText: string, targetType: ProblemTy
         ]
       }
     }
-  ]
+  ],
+  "approachOverview": {
+    "methodName": "解题方法名称（如：BFS 广度优先搜索、双指针、动态规划）",
+    "coreInsight": "该方法的核心思路，一两句话讲清为什么这个方法是正确的选择（20-40字）",
+    "whyBetter": "相比其他方法的优势（可选，10-20字，如：比DFS更直观）"
+  },
+  "complexity": {
+    "timeComplexity": "时间复杂度（如：O(n)、O(n log n)）",
+    "spaceComplexity": "空间复杂度（如：O(1)、O(n)）",
+    "briefExplanation": "用自然语言简要解释复杂度的来源（20-40字）"
+  },
+  "summary": "视频末尾展示的一句总结金句，概括本题核心思路与关键技巧（20-40字）"
 }
 注意：针对 LeetCode 题型，你必须将解题思路拆分为至少 3-6 个逻辑连贯的 \`steps\` 数组，绝对不能只返回 1 个 step。每一个 \`step\` 都必须包含对应的 \`state\` 对象，且 \`state.structures\` 数组绝对不能为空！
 

@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { Toast, useToast } from '../ui/Toast';
 import { ProblemType } from '../../types/problem';
 import { getApiConfigForRequest } from '../../services/apiConfig';
-import { getCurrentTier } from '../../services/licenseStore';
 
 interface ParsedItem {
   title: string;
@@ -28,7 +27,7 @@ export const BatchEditor: React.FC = () => {
 
     const interval = setInterval(async () => {
       try {
-        const res = await fetch(`http://localhost:3001/api/batch/status/${jobId}`);
+        const res = await fetch(`/api/batch/status/${jobId}`);
         if (res.ok) {
           const data = await res.json();
           setJobStatus(data);
@@ -59,7 +58,7 @@ export const BatchEditor: React.FC = () => {
         ? { rawText: inputValue, model: aiModel, ...apiCfg }
         : { url: inputValue, model: aiModel };
 
-      const res = await fetch(`http://localhost:3001${endpoint}`, {
+      const res = await fetch(`${endpoint}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
@@ -79,15 +78,14 @@ export const BatchEditor: React.FC = () => {
     }
   };
 
+  const handleRemoveItem = (idx: number) => {
+    setParsedItems(prev => prev.filter((_, i) => i !== idx));
+  };
+
   const handleStartBatch = async () => {
     if (parsedItems.length === 0) return;
-    const tier = getCurrentTier();
-    if (tier === 'free' && parsedItems.length > 3) {
-      showToast('免费版限制', '免费版最多同时处理 3 条题目，升级 Pro 解锁无限制。', 'error');
-      return;
-    }
     try {
-      const res = await fetch('http://localhost:3001/api/batch/start', {
+      const res = await fetch('/api/batch/start', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ items: parsedItems })
@@ -109,7 +107,7 @@ export const BatchEditor: React.FC = () => {
     if (!jobId) return;
     setIsMerging(true);
     try {
-      const res = await fetch(`http://localhost:3001/api/batch/merge/${jobId}`, {
+      const res = await fetch(`/api/batch/merge/${jobId}`, {
         method: 'POST',
       });
       const data = await res.json();
@@ -147,7 +145,7 @@ export const BatchEditor: React.FC = () => {
     }
   };
 
-  const inputCls = 'w-full px-4 py-3 bg-gray-50 dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 rounded-xl text-sm text-gray-900 dark:text-zinc-100 placeholder-gray-400 dark:placeholder-zinc-500 focus:bg-white dark:focus:bg-zinc-800 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-colors';
+  const inputCls = 'w-full px-4 py-3 bg-gray-50 dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 rounded-xl text-sm text-gray-900 dark:text-zinc-100 placeholder-gray-400 dark:placeholder-zinc-500 focus:bg-white dark:focus:bg-zinc-800 focus:ring-2 focus:ring-cyan-500/20 focus:border-cyan-500 outline-none transition-colors';
 
   return (
     <div className="h-full flex flex-col bg-white dark:bg-zinc-900 overflow-hidden">
@@ -163,7 +161,7 @@ export const BatchEditor: React.FC = () => {
           <select
             value={aiModel}
             onChange={(e) => setAiModel(e.target.value)}
-            className="appearance-none pl-3 pr-8 py-2 bg-gray-50 dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 rounded-lg text-xs font-medium text-gray-700 dark:text-zinc-300 focus:ring-2 focus:ring-indigo-500/20 outline-none cursor-pointer"
+            className="appearance-none pl-3 pr-8 py-2 bg-gray-50 dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 rounded-lg text-xs font-medium text-gray-700 dark:text-zinc-300 focus:ring-2 focus:ring-cyan-500/20 outline-none cursor-pointer"
           >
             <option value="deepseek-v4-flash">DeepSeek V4 Flash</option>
             <option value="deepseek-v4-pro">DeepSeek V4 Pro</option>
@@ -192,7 +190,7 @@ export const BatchEditor: React.FC = () => {
                     onClick={() => setInputType(id as 'text' | 'url')}
                     className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
                       inputType === id
-                        ? 'bg-indigo-600 text-white'
+                        ? 'bg-cyan-600 text-white'
                         : 'bg-gray-100 dark:bg-zinc-800 text-gray-600 dark:text-zinc-400 hover:bg-gray-200 dark:hover:bg-zinc-700'
                     }`}
                   >
@@ -223,7 +221,7 @@ export const BatchEditor: React.FC = () => {
                 <button
                   onClick={handleSplit}
                   disabled={isSplitting || !inputValue.trim()}
-                  className="flex items-center gap-2 px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed text-white text-sm font-semibold rounded-xl transition-colors"
+                  className="flex items-center gap-2 px-5 py-2.5 bg-cyan-600 hover:bg-cyan-700 disabled:opacity-50 disabled:cursor-not-allowed text-white text-sm font-semibold rounded-xl transition-colors"
                 >
                   {isSplitting && (
                     <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24">
@@ -242,7 +240,7 @@ export const BatchEditor: React.FC = () => {
                   <h3 className="text-sm font-semibold text-gray-900 dark:text-zinc-100">已提取 {parsedItems.length} 道题目</h3>
                   <button
                     onClick={handleStartBatch}
-                    className="flex items-center gap-1.5 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold rounded-lg transition-colors"
+                    className="flex items-center gap-1.5 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 disabled:opacity-40 disabled:cursor-not-allowed text-white text-xs font-semibold rounded-lg transition-colors"
                   >
                     <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
@@ -250,20 +248,33 @@ export const BatchEditor: React.FC = () => {
                     开始批量生产
                   </button>
                 </div>
+
                 <div className="divide-y divide-gray-100 dark:divide-zinc-800 max-h-[400px] overflow-y-auto">
-                  {parsedItems.map((item, idx) => (
-                    <div key={idx} className="p-4 hover:bg-gray-50 dark:hover:bg-zinc-800/50 transition-colors">
-                      <div className="flex gap-3">
-                        <span className="shrink-0 w-6 h-6 rounded-full bg-indigo-100 dark:bg-indigo-500/20 text-indigo-700 dark:text-indigo-400 flex items-center justify-center text-xs font-bold">
+                  {parsedItems.map((item, idx) => {
+                    return (
+                      <div
+                        key={idx}
+                        className={`p-4 flex items-center gap-3 transition-colors hover:bg-gray-50 dark:hover:bg-zinc-800/50`}
+                      >
+                        <span className={`shrink-0 w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold bg-cyan-100 dark:bg-cyan-500/20 text-cyan-700 dark:text-cyan-400`}>
                           {idx + 1}
                         </span>
-                        <div>
-                          <h4 className="text-sm font-semibold text-gray-900 dark:text-zinc-100 mb-0.5">{item.title}</h4>
+                        <div className="flex-1 min-w-0">
+                          <h4 className="text-sm font-semibold text-gray-900 dark:text-zinc-100 mb-0.5 truncate">{item.title}</h4>
                           <p className="text-xs text-gray-500 dark:text-zinc-400 line-clamp-2">{item.question}</p>
                         </div>
+                        <button
+                          onClick={() => handleRemoveItem(idx)}
+                          className="shrink-0 w-6 h-6 rounded-md flex items-center justify-center text-gray-300 dark:text-zinc-600 hover:text-red-500 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/30 transition-colors"
+                          title="删除此题"
+                        >
+                          <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                          </svg>
+                        </button>
                       </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               </div>
             )}
@@ -279,7 +290,7 @@ export const BatchEditor: React.FC = () => {
                 <div className="flex gap-2">
                   {mergedVideoUrl ? (
                     <a
-                      href={`http://localhost:3001${mergedVideoUrl}`}
+                      href={`${mergedVideoUrl}`}
                       download
                       target="_blank"
                       rel="noopener noreferrer"
@@ -294,7 +305,7 @@ export const BatchEditor: React.FC = () => {
                     <button
                       onClick={handleMergeVideos}
                       disabled={isMerging}
-                      className="flex items-center gap-1.5 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white text-xs font-semibold rounded-lg transition-colors"
+                      className="flex items-center gap-1.5 px-4 py-2 bg-cyan-600 hover:bg-cyan-700 disabled:opacity-50 text-white text-xs font-semibold rounded-lg transition-colors"
                     >
                       {isMerging && (
                         <svg className="animate-spin h-3.5 w-3.5" viewBox="0 0 24 24">
@@ -335,11 +346,11 @@ export const BatchEditor: React.FC = () => {
                       </span>
                       {item.videoUrl && (
                         <a
-                          href={`http://localhost:3001${item.videoUrl}`}
+                          href={`${item.videoUrl}`}
                           download
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="text-xs text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 font-medium"
+                          className="text-xs text-cyan-600 dark:text-cyan-400 hover:text-cyan-800 font-medium"
                         >
                           下载视频
                         </a>
@@ -350,7 +361,7 @@ export const BatchEditor: React.FC = () => {
                   <div className="w-full bg-gray-100 dark:bg-zinc-800 rounded-full h-1 overflow-hidden">
                     <div
                       className={`h-1 rounded-full transition-all duration-500 ${
-                        item.status === 'failed' ? 'bg-red-500' : 'bg-indigo-600'
+                        item.status === 'failed' ? 'bg-red-500' : 'bg-cyan-600'
                       }`}
                       style={{ width: `${item.progress}%` }}
                     />
@@ -363,7 +374,7 @@ export const BatchEditor: React.FC = () => {
 
               {!jobStatus && (
                 <div className="p-12 flex justify-center">
-                  <svg className="animate-spin h-8 w-8 text-indigo-500" viewBox="0 0 24 24">
+                  <svg className="animate-spin h-8 w-8 text-cyan-500" viewBox="0 0 24 24">
                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
                     <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
                   </svg>

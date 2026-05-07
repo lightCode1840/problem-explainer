@@ -17,11 +17,17 @@ html {
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb {
-  background: rgba(99, 102, 241, 0.5);
+  background: rgba(34, 184, 207, 0.5);
   border-radius: 4px;
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-  background: rgba(99, 102, 241, 0.8);
+  background: rgba(34, 184, 207, 0.8);
+}
+
+/* Toast progress bar */
+@keyframes toast-progress {
+  from { transform: scaleX(1); }
+  to   { transform: scaleX(0); }
 }
 

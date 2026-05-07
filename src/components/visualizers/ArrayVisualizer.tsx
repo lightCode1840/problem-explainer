@@ -124,12 +124,12 @@ export const ArrayVisualizer: React.FC<Props> = ({ prevState, currState, progres
                 transform: `translateX(${currentX}px)` 
               }}
             >
-              <svg className="w-6 h-6 text-indigo-400 mb-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <svg className="w-6 h-6 text-cyan-400 mb-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 10l7-7m0 0l7 7m-7-7v18" />
               </svg>
               {/* Hide subtitle/name if container is too compressed (Priority c) */}
               {ratio <= 1.5 && (
-                <div className="bg-indigo-500 text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg whitespace-nowrap">
+                <div className="bg-cyan-500 text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg whitespace-nowrap">
                   {name}
                 </div>
               )}

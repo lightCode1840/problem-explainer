@@ -11,25 +11,14 @@ export async function exportVideo(
   onProgressCallback?: (progress: number) => void,
   showWatermark = false
 ) {
-  // 1. 设置路径
   const compositionId = 'ProblemExplainer';
-  const entry = path.resolve(process.cwd(), 'src/index.ts');
-  const outDir = path.resolve(process.cwd(), 'out');
-  
-  if (!fs.existsSync(outDir)) {
-    fs.mkdirSync(outDir, { recursive: true });
-  }
+
+  // Output goes to the user-writable data directory (supports Electron packaging)
+  const outDir = path.resolve(process.env.PEX_DATA_DIR ?? process.cwd(), 'out');
+  if (!fs.existsSync(outDir)) fs.mkdirSync(outDir, { recursive: true });
 
   const outputFile = path.join(outDir, `${outputFilename}.mp4`);
 
-  console.log('Starting video export process...');
-  console.log('Entry point:', entry);
-  console.log('Output destination:', outputFile);
-
-  // Remotion's server-side renderer serves the bundle from its own webpack-bundle
-  // server (a temp URL like http://localhost:3000/...). Relative audioUrl paths
-  // resolve against that bundle server, not our Express server, causing a 404.
-  // Convert relative paths to absolute before handing off to Remotion.
   const port = process.env.PORT || 3001;
   const renderData: AnyProblemData = {
     ...data,
@@ -39,26 +28,36 @@ export async function exportVideo(
   };
 
   try {
-    // 2. Bundle the video using Webpack (Remotion's bundler)
-    console.log('Bundling video...');
-    const bundleLocation = await bundle({
-      entryPoint: entry,
-      webpackOverride: (config) => enableTailwind(config),
-    });
+    // Use a pre-built Remotion bundle when available (production / Electron packaged).
+    // Falls back to building fresh via webpack (dev mode).
+    const remotionBundleDir = process.env.PEX_REMOTION_BUNDLE_DIR
+      ?? path.resolve(process.cwd(), 'build');
+    const prebuiltIndex = path.join(remotionBundleDir, 'index.html');
 
-    // 3. Extract metadata and select the composition
-    console.log('Extracting composition metadata...');
+    let bundleLocation: string;
+    if (fs.existsSync(prebuiltIndex)) {
+      // Serve the pre-built bundle through the running Express server
+      bundleLocation = `http://localhost:${port}/remotion-bundle/index.html`;
+      console.log('Using pre-built Remotion bundle:', bundleLocation);
+    } else {
+      console.log('Building Remotion bundle (first run may take ~30 s)…');
+      const entry = path.resolve(process.cwd(), 'src/index.ts');
+      bundleLocation = await bundle({
+        entryPoint: entry,
+        webpackOverride: (config) => enableTailwind(config),
+      });
+    }
+
+    console.log('Selecting composition…');
     const composition = await selectComposition({
       serveUrl: bundleLocation,
       id: compositionId,
       inputProps: { data: renderData, showWatermark },
     });
 
-    // Use the accurate duration calculated from TTS
     const durationInFrames = renderData.durationInFrames || composition.durationInFrames;
 
-    // 4. Render the video
-    console.log(`Rendering video (${durationInFrames} frames)...`);
+    console.log(`Rendering ${durationInFrames} frames…`);
     await renderMedia({
       composition,
       serveUrl: bundleLocation,
@@ -66,17 +65,15 @@ export async function exportVideo(
       outputLocation: outputFile,
       inputProps: { data: renderData, showWatermark },
       onProgress: ({ progress }) => {
-        console.log(`Rendering progress: ${Math.round(progress * 100)}%`);
-        if (onProgressCallback) {
-          onProgressCallback(progress);
-        }
+        console.log(`Progress: ${Math.round(progress * 100)}%`);
+        onProgressCallback?.(progress);
       },
     });
 
-    console.log('Video rendered successfully at:', outputFile);
+    console.log('Rendered to:', outputFile);
     return outputFile;
   } catch (error) {
-    console.error('Failed to export video:', error);
+    console.error('Export failed:', error);
     throw error;
   }
 }

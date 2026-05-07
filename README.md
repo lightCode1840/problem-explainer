@@ -1,4 +1,4 @@
-# AI Problem Explainer - 智能题目解析与视频生成系统
+# 码帧 TutorReel — AI 题目解析与视频生成系统
 
 这是一个基于 Remotion、React 和 Tailwind CSS 构建的自动化题目解析和视频生成平台。该系统能够接入大语言模型（如 DeepSeek），自动将编程算法题、英语语法题、Java 八股文等解析为带有动态图解和拟人化语音讲解的短视频。
 
@@ -18,46 +18,118 @@
 - **大模型**：DeepSeek (通过 OpenAI 兼容接口)
 - **测试**：Playwright (E2E 测试)
 
+## 分发方式
+
+| 方式 | 适合对象 | 命令 |
+|------|----------|------|
+| **桌面应用（推荐）** | 普通用户 | `npm run dist:mac` / `npm run dist:win` |
+| **网页模式** | 本地使用 | `npm run build && npm start` → 浏览器打开 |
+| **开发模式** | 开发者 | `npm run dev` |
+
+---
+
 ## 快速开始
 
-### 1. 环境准备
+### 前置要求
 
-安装依赖：
+| 工具 | 版本 | 安装 |
+|------|------|------|
+| Node.js | 18+ | https://nodejs.org |
+| FFmpeg | 任意 | macOS: `brew install ffmpeg` · Windows: `winget install ffmpeg` |
+
+### 第一步：下载代码
+
+```bash
+git clone <仓库地址>
+cd problem-explainer
+```
+
+或直接下载 ZIP 解压。
+
+### 第二步：安装依赖
+
 ```bash
 npm install
 ```
 
-如果你需要导出 MP4 视频或进行音轨分析，请确保系统已安装 `ffmpeg`：
-```bash
-# macOS
-brew install ffmpeg
+### 第三步：配置 API Key
 
-# Windows（使用 winget）
-winget install ffmpeg
+将 `.env.example` 复制为 `.env`，填入你的大模型 API Key：
+
+```bash
+cp .env.example .env
 ```
 
-### 2. 环境变量
-
-在项目根目录创建 `.env` 文件，并配置大模型 API Key：
 ```env
-OPENAI_API_KEY="你的_deepseek_api_key"
-OPENAI_BASE_URL="https://api.deepseek.com"
+# 大模型（DeepSeek / OpenAI 兼容接口均可）
+OPENAI_API_KEY=你的_api_key
+OPENAI_BASE_URL=https://api.deepseek.com
+
+# License Key（购买后填入，不填默认 Free 版）
+VALID_LICENSE_KEYS=PEX-XXXX-XXXX-XXXX
 ```
 
-### 3. 启动项目
-
-我们使用 `concurrently` 同时启动前端和后端服务，并支持后端热更新。
+### 第四步：构建并启动
 
 ```bash
-npm run dev
+npm run build    # 构建前端（约 30 秒）
+npm start        # 启动服务
 ```
-- 前端编辑器访问地址：`http://localhost:5173/`
-- 后端 API 接口地址：`http://localhost:3001/`
 
-### 4. 渲染与导出
+启动后在浏览器打开 **http://localhost:3001**
 
-通过前端页面的“导出视频”按钮，系统会在后台自动渲染。
-导出的 MP4 文件将统一存放在项目根目录的 `/out` 文件夹中。
+> 导出的 MP4 文件保存在项目根目录的 `out/` 文件夹。
+
+---
+
+## 打包为桌面应用（.dmg / .exe）
+
+### 前置要求
+
+除 Node.js + FFmpeg 外，还需要：
+- **macOS**：Xcode Command Line Tools（`xcode-select --install`）
+- **Windows**：无额外要求，nsis 由 electron-builder 自动下载
+
+### 打包步骤
+
+```bash
+# 安装依赖（首次）
+npm install
+
+# 填好 .env（API Key + License Keys）
+cp .env.example .env
+
+# 打包（在 macOS 上打 .dmg，在 Windows 上打 .exe）
+npm run dist:mac    # → dist-app/*.dmg
+npm run dist:win    # → dist-app/*.exe
+```
+
+打包时间约 3–10 分钟（主要是 Remotion bundle 构建）。
+
+生成的安装包在 `dist-app/` 目录：
+- macOS：`码帧 TutorReel-1.0.0.dmg`（约 400–600 MB）
+- Windows：`码帧 TutorReel Setup 1.0.0.exe`
+
+### 应用图标（可选）
+
+在 `build/` 目录放置：
+- `build/icon.icns`（macOS，1024×1024）
+- `build/icon.ico`（Windows，256×256）
+
+### 用户数据目录
+
+安装后，用户生成的文件保存在：
+- macOS：`~/Library/Application Support/码帧 TutorReel/`
+- Windows：`%APPDATA%\码帧 TutorReel\`
+
+---
+
+### 开发模式（仅限开发者）
+
+```bash
+npm run dev          # 启动 Vite + Express（两个进程）
+npm run electron:dev # 在 Electron 窗口中运行（先确保 npm run dev 已启动）
+```
 
 ## 开发指南
 

@@ -140,10 +140,10 @@ export const GridVisualizer: React.FC<Props> = ({ prevState, currState, progress
                 left: '1rem',
               }}
             >
-              <div className="bg-indigo-500 text-white text-xs font-bold px-2 py-0.5 rounded shadow-lg mb-1 whitespace-nowrap">
+              <div className="bg-cyan-500 text-white text-xs font-bold px-2 py-0.5 rounded shadow-lg mb-1 whitespace-nowrap">
                 {name}
               </div>
-              <svg className="w-5 h-5 text-indigo-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <svg className="w-5 h-5 text-cyan-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M12 19V5m0 14l-4-4m4 4l4-4" />
               </svg>
             </div>

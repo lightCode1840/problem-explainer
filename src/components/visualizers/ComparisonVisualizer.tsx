@@ -30,11 +30,11 @@ export const ComparisonVisualizer: React.FC<Props> = ({ comparisonData, activeSt
         style={{ transform: `scale(${finalScale})`, transformOrigin: 'center center' }}
       >
         {/* Table Header */}
-        <div className="flex bg-indigo-50 border-b border-slate-200">
+        <div className="flex bg-cyan-50 border-b border-slate-200">
           {comparisonData.headers.map((header, idx) => (
             <div 
               key={idx} 
-              className={`flex-1 p-4 text-center font-bold text-indigo-800 ${idx > 0 ? 'border-l border-indigo-100' : ''}`}
+              className={`flex-1 p-4 text-center font-bold text-cyan-800 ${idx > 0 ? 'border-l border-cyan-100' : ''}`}
             >
               {header}
             </div>
@@ -66,7 +66,7 @@ export const ComparisonVisualizer: React.FC<Props> = ({ comparisonData, activeSt
               <div 
                 key={rowIndex}
                 className={`flex border-b border-slate-100 last:border-b-0 transition-colors duration-700 ease-in-out ${
-                  isActive ? 'bg-indigo-50/50' : 'bg-white'
+                  isActive ? 'bg-cyan-50/50' : 'bg-white'
                 }`}
                 style={{
                   opacity: appearProgress,
@@ -85,7 +85,7 @@ export const ComparisonVisualizer: React.FC<Props> = ({ comparisonData, activeSt
                     } ${colIndex > 0 ? 'border-l border-slate-100' : ''}`}
                   >
                     <span className={`px-2 sm:px-4 py-1.5 rounded-lg transition-all duration-700 ease-in-out text-sm sm:text-base leading-snug break-words max-w-full ${
-                      isActive && colIndex > 0 ? 'bg-white shadow-sm border border-indigo-100 font-medium text-indigo-700 scale-105' : 'border border-transparent'
+                      isActive && colIndex > 0 ? 'bg-white shadow-sm border border-cyan-100 font-medium text-cyan-700 scale-105' : 'border border-transparent'
                     }`}>
                       {cell}
                     </span>

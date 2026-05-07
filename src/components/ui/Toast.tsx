@@ -1,5 +1,6 @@
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { createPortal } from 'react-dom';
+import { CircleCheck, CircleX, Info } from 'lucide-react';
 
 export interface ToastMessage {
   title: string;
@@ -12,61 +13,98 @@ interface ToastProps {
   onClose: () => void;
 }
 
+const typeConfig = {
+  success: {
+    icon: CircleCheck,
+    ring: 'ring-1 ring-emerald-200 dark:ring-emerald-800',
+    bg: 'bg-white dark:bg-zinc-900',
+  },
+  error: {
+    icon: CircleX,
+    ring: 'ring-1 ring-red-200 dark:ring-red-800',
+    bg: 'bg-white dark:bg-zinc-900',
+  },
+  info: {
+    icon: Info,
+    ring: 'ring-1 ring-gray-200 dark:ring-zinc-700',
+    bg: 'bg-white dark:bg-zinc-900',
+  },
+};
+
 export const Toast: React.FC<ToastProps> = ({ message, onClose }) => {
+  const [visible, setVisible] = useState(false);
+
+  useEffect(() => {
+    if (message) {
+      requestAnimationFrame(() => setVisible(true));
+    } else {
+      setVisible(false);
+    }
+  }, [message]);
+
+  const handleClose = useCallback(() => {
+    setVisible(false);
+    setTimeout(onClose, 200);
+  }, [onClose]);
+
+  useEffect(() => {
+    if (!message) return;
+    const timer = setTimeout(handleClose, 4000);
+    return () => clearTimeout(timer);
+  }, [message, handleClose]);
+
   if (!message || typeof document === 'undefined') return null;
 
-  return createPortal(
-    <div className="fixed inset-0 z-[99999] flex items-center justify-center p-4 pointer-events-none">
-      <div className="absolute inset-0 bg-black/30 backdrop-blur-sm animate-in fade-in duration-300" />
-      <div className={`relative flex flex-col items-center justify-center gap-4 p-8 min-w-[320px] max-w-sm rounded-[2rem] border pointer-events-auto animate-in zoom-in-95 slide-in-from-bottom-8 duration-300 ${
-        message.type === 'success' ? 'bg-white dark:bg-zinc-900 border-emerald-100 dark:border-emerald-900/40' :
-        message.type === 'error'   ? 'bg-white dark:bg-zinc-900 border-red-100 dark:border-red-900/40' :
-                                     'bg-white dark:bg-zinc-900 border-blue-100 dark:border-blue-900/40'
-      }`}>
-        <div className={`w-16 h-16 rounded-full flex items-center justify-center ${
-          message.type === 'success' ? 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400' :
-          message.type === 'error'   ? 'bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400' :
-                                       'bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400'
-        }`}>
-          {message.type === 'success' && (
-            <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
-            </svg>
-          )}
-          {message.type === 'error' && (
-            <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" />
-            </svg>
-          )}
-          {message.type === 'info' && (
-            <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-          )}
-        </div>
+  const Icon = typeConfig[message.type].icon;
 
-        <div className="text-center">
-          <h4 className={`text-xl font-bold ${
-            message.type === 'success' ? 'text-emerald-900 dark:text-emerald-300' :
-            message.type === 'error'   ? 'text-red-900 dark:text-red-300' :
-                                         'text-blue-900 dark:text-blue-300'
-          }`}>{message.title}</h4>
-          <p className="text-sm font-medium text-gray-500 dark:text-zinc-400 mt-2 whitespace-pre-line leading-relaxed">
+  return createPortal(
+    <div className="fixed top-20 right-4 z-[99999] pointer-events-none">
+      <div
+        onClick={handleClose}
+        className={`pointer-events-auto flex items-start gap-3 w-80 px-4 py-3
+          rounded-xl shadow-lg shadow-black/10 dark:shadow-black/30
+          ${typeConfig[message.type].bg} ${typeConfig[message.type].ring}
+          transition-all duration-200 ease-out cursor-pointer
+          ${visible
+            ? 'translate-x-0 opacity-100'
+            : 'translate-x-2 opacity-0'
+          }`}
+      >
+        <Icon
+          className={`shrink-0 mt-0.5 w-5 h-5 ${
+            message.type === 'success' ? 'text-emerald-500' :
+            message.type === 'error' ? 'text-red-500' :
+            'text-cyan-500'
+          }`}
+          strokeWidth={2}
+        />
+
+        <div className="flex-1 min-w-0">
+          <p className="text-sm font-semibold text-gray-900 dark:text-zinc-100">
+            {message.title}
+          </p>
+          <p className="text-xs text-gray-500 dark:text-zinc-400 mt-0.5 leading-relaxed">
             {message.desc}
           </p>
         </div>
 
-        <button
-          onClick={onClose}
-          className="absolute top-4 right-4 text-gray-400 dark:text-zinc-500 hover:text-gray-700 dark:hover:text-zinc-300 bg-gray-100 dark:bg-zinc-800 hover:bg-gray-200 dark:hover:bg-zinc-700 rounded-full p-1.5 transition-colors"
-        >
-          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" />
-          </svg>
-        </button>
+        {/* Progress bar */}
+        <div className="absolute bottom-0 left-2 right-2 h-0.5 rounded-full overflow-hidden">
+          <div
+            className={`h-full rounded-full ${
+              message.type === 'success' ? 'bg-emerald-400' :
+              message.type === 'error' ? 'bg-red-400' :
+              'bg-cyan-400'
+            }`}
+            style={{
+              animation: 'toast-progress 4s linear',
+              transformOrigin: 'left',
+            }}
+          />
+        </div>
       </div>
     </div>,
-    document.body
+    document.body,
   );
 };
 
@@ -75,7 +113,6 @@ export const useToast = () => {
 
   const showToast = (title: string, desc: string, type: ToastMessage['type'] = 'info') => {
     setToastMessage({ title, desc, type });
-    setTimeout(() => setToastMessage(null), 4000);
   };
 
   return { toastMessage, showToast, setToastMessage };
