@@ -2,6 +2,10 @@
 
 粘贴题目，AI 自动拆解知识点、生成配音与可视化动画，一键导出 MP4 讲解视频。支持 LeetCode 算法题、英语语法、Java 面试等多种题型。
 
+<p align="center">
+  <img src="./screenshots/main.png" alt="TutorReel 界面截图" width="800" style="border-radius: 12px;" />
+</p>
+
 ## 主要功能
 
 - **多模型接入** — 支持 DeepSeek、GPT、Qwen 等主流大模型，自由切换
